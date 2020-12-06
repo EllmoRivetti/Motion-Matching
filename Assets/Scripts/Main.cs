@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
-public class Main : MonoBehaviour
+public class Main : SerializedMonoBehaviour
 {
 	#region OnUpdateDelegate
 	public delegate void OnUpdateDelegate(float deltaTime);
@@ -10,18 +11,30 @@ public class Main : MonoBehaviour
 	#endregion
 
 	#region Members
+	[Header("Update Coroutine")]
 	public float m_UpdateDeltaTime = 0.5f;
 	public bool m_Run = true;
 	public bool m_Pause = false;
 
+
 	private IEnumerator m_UpdateCR;
 	private bool m_UpdateCR_isRunning = false;
+
+	[Header("Animations data")]
+	public AnimationClipBank m_AnimationBank;
 	#endregion
 
 	private void Start()
 	{
 		s_OnUpdateEvents += TraceExecTime;
+		InitFrameData();
 	}
+
+	private void InitFrameData()
+	{
+		
+	}
+
 
 
 	private float m_tmp_timeSinceStart = 0.0f;
