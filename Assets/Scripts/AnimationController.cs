@@ -34,7 +34,7 @@ namespace MotionMatching.Animation
 		public Vector3 m_Scale;
 	}
 
-	public class AnimationController : RunnableCoroutine
+	public class AnimationController : SerializedMonoBehaviour
 	{
 		[Header("Animation data")]
 		[ShowInInspector, ReadOnly] public Dictionary<RigBodyParts, Transform> m_Bones;
@@ -44,51 +44,58 @@ namespace MotionMatching.Animation
 
 		[Header("Parameters")]
 		public int m_FramesPerSecond = 30;
-		
-		private int m_CurrentFrame = 1;
-		private int m_LastFrameNumber = -1;
-		
 
-		public void Awake()
+		protected int m_CurrentFrame = 1;
+		protected int m_LastFrameNumber = -1;
+
+		protected bool m_Run = false;
+		protected bool m_Pause = false;
+
+		#region Event buttons
+		[Button]
+		public void Run()
 		{
+			m_Run = true;
 		}
+		[Button]
+		public void Stop()
+		{
+			m_Run = false;
+		}
+		[Button]
+		public void Pause()
+		{
+			m_Pause = !m_Pause;
+		}
+		#endregion
 
 		public IEnumerator RunAnimation()
 		{
-			while(true)
+			while(m_Run && !m_Pause)
 			{
-				if (m_FrameData.ContainsKey(m_CurrentFrame) || m_CurrentFrame == 1)
-				{
-					var currentFrameData = GetBonesDataForFrame(m_CurrentFrame);
-					
-					foreach (var rigFrameData in currentFrameData)
-					{
-						var bone = m_Bones[rigFrameData.Key];
-						var boneFrameData = rigFrameData.Value;
+				var currentFrameData = GetBonesDataForFrame(m_CurrentFrame);
+				SetBonesData(currentFrameData);
 
-						SetBoneData(bone, boneFrameData);
-					}
-				}
 				yield return new WaitForSeconds(1 / m_FramesPerSecond);
 				m_CurrentFrame++;
 			}
 		}
 
+		public void SetBonesData(Dictionary<RigBodyParts, BoneData> currentFrameData)
+		{
+			foreach (var rigFrameData in currentFrameData)
+			{
+				var bone = m_Bones[rigFrameData.Key];
+				var boneFrameData = rigFrameData.Value;
+
+				SetBoneData(bone, boneFrameData);
+			}
+		}
 		public void SetBoneData(Transform t, BoneData bd)
 		{
 			t.position = bd.m_Position;
 			t.eulerAngles = bd.m_Rotation;
 			t.localScale = bd.m_Scale;
-		}
-
-		public void StartAnimation()
-		{
-
-		}
-
-		public void StopAnimation()
-		{
-
 		}
 
 		/*

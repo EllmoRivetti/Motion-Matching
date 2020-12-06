@@ -17,7 +17,7 @@ public class RunnableCoroutine : SerializedMonoBehaviour
 	public bool m_Pause = false;
 	
 	protected IEnumerator m_CR;
-	protected bool m_UpdateCR_isRunning = false;
+	protected bool m_CRisRunning = false;
 	#endregion
 
 	#region UpdateCoroutine
@@ -42,16 +42,12 @@ public class RunnableCoroutine : SerializedMonoBehaviour
 
 	protected void RunCoroutine()
 	{
-		if (!m_UpdateCR_isRunning)
+		if (!m_CRisRunning)
 		{
 			m_CR = UpdateCR();
 			StartCoroutine(m_CR);
-			m_UpdateCR_isRunning = true;
+			m_CRisRunning = true;
 		}
-	}
-	protected void ResumeCoroutine()
-	{
-
 	}
 	protected void StopCoroutine()
 	{
@@ -59,7 +55,7 @@ public class RunnableCoroutine : SerializedMonoBehaviour
 		{
 			StopCoroutine(m_CR);
 			m_CR = null;
-			m_UpdateCR_isRunning = false;
+			m_CRisRunning = false;
 		}
 		catch (UnityException e)
 		{
