@@ -39,5 +39,72 @@ namespace MotionMatching.Animation
 		public Dictionary<RigBodyParts, Transform> m_Bones;
 		public Dictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData;
 
-	}
+        public Dictionary<RigBodyParts, BoneData> GetBonesDataForFrame(float frameNb)
+        {
+            int firstFrameNb = -1,
+                secondFrameNb = -1;
+
+            Dictionary<RigBodyParts, BoneData> firstFrameBonesData  = new Dictionary<RigBodyParts, BoneData>(),
+                                               secondFrameBonesData = new Dictionary<RigBodyParts, BoneData>();
+
+            //Return value
+            Dictionary<RigBodyParts, BoneData> bonesDataForFrame = new Dictionary<RigBodyParts, BoneData>(); 
+
+
+            foreach (KeyValuePair<int, Dictionary<RigBodyParts, BoneData>> bonesData in m_FrameData)
+            {
+                if(bonesData.Key < frameNb)
+                {
+                    if(firstFrameNb == -1 && secondFrameNb == -1)
+                    {
+                        firstFrameNb = bonesData.Key;
+                        firstFrameBonesData = bonesData.Value;
+
+                        secondFrameNb = bonesData.Key;
+                        secondFrameBonesData = bonesData.Value;
+                    }
+                    else
+                    {
+                        firstFrameNb = bonesData.Key;
+                        firstFrameBonesData = bonesData.Value;
+                    }
+                }
+                else if (bonesData.Key > frameNb)
+                {
+                    secondFrameNb = bonesData.Key;
+                    secondFrameBonesData = bonesData.Value;
+                    break;
+                }
+                else// frameNb == bonesData.key
+                {
+                    return bonesData.Value;
+                }
+            }
+
+            foreach (KeyValuePair<RigBodyParts, BoneData> boneData in firstFrameBonesData)
+            {
+                BoneData data = GetBoneDataForFrameT(boneData.Value, secondFrameBonesData[boneData.Key], firstFrameNb, secondFrameNb);
+                bonesDataForFrame.Add(boneData.Key, data);
+            }
+
+            return bonesDataForFrame;
+        }
+
+        public BoneData GetBoneDataForFrameT(BoneData firstFrameBoneData, BoneData secondFrameBoneData, float firstFrameNb, float secondFrameNb)
+        {
+            BoneData boneData = new BoneData();
+
+            float t = firstFrameNb / secondFrameNb;
+
+            boneData.m_Rotation = GetInterpolatedValue(firstFrameBoneData.m_Rotation, secondFrameBoneData.m_Rotation, t);
+            boneData.m_Position = GetInterpolatedValue(firstFrameBoneData.m_Position, secondFrameBoneData.m_Position, t);
+
+            return boneData;
+        }
+
+        public Vector3 GetInterpolatedValue(Vector3 a, Vector3 b, float t)
+        {
+            return Vector3.Lerp(a, b, t);
+        }
+    }
 }
