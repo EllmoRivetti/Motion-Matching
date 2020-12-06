@@ -2,20 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using MotionMatching.Animation;
 
 public class AnimationData : ScriptableObject
 {
 	public string m_AnimationClipFileName;
-	public AnimationClip m_AnimationClip;
+	public AnimationController m_AnimationController;
 	public List<FrameData> m_FrameData;
 
 	/**
 	 * Creates frame data implicitly
 	 **/
-	public AnimationData(string m_AnimationClipFileName, AnimationClip m_AnimationClip)
+	public AnimationData(string m_AnimationClipFileName, AnimationController m_AnimationController)
 	{
 		this.m_AnimationClipFileName = m_AnimationClipFileName;
-		this.m_AnimationClip = m_AnimationClip;
+		this.m_AnimationController = m_AnimationController;
 		InitFrameData();
 	}
 
