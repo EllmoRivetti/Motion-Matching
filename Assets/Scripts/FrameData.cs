@@ -30,12 +30,12 @@ public class FrameData
         }
     }
 
-    public FrameData(float m_FrameTime, Vector2 m_PositionHipProjection, Vector2 m_PositionFuturHipProjection, FeetPositions m_PositionFeet)
+    public FrameData(float frameTime, Vector2 positionHipProjection, Vector2 positionFuturHipProjection, FeetPositions positionFeet)
     {
-        this.m_FrameTime = m_FrameTime;
-        this.m_PositionHipProjection = m_PositionHipProjection;
-        this.m_PositionFuturHipProjection = m_PositionFuturHipProjection;
-        this.m_PositionFeet = m_PositionFeet;
+        this.m_FrameTime = frameTime;
+        this.m_PositionHipProjection = positionHipProjection;
+        this.m_PositionFuturHipProjection = positionFuturHipProjection;
+        this.m_PositionFeet = positionFeet;
     }
 
     public float GetFrameScore(Vector2 hipTarget)
