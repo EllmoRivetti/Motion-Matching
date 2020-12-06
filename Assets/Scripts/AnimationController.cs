@@ -27,17 +27,85 @@ namespace MotionMatching.Animation
 		RIGHT_HAND_RING_PROXIMAL, RIGHT_HAND_RING_INTERMEDIATE, RIGHT_HAND_RING_DISTAL,
 		RIGHT_HAND_LITTLE_PROXIMAL, RIGHT_HAND_LITTLE_INTERMEDIATE, RIGHT_HAND_LITTLE_DISTAL
 	}
-
-	public class BoneData
+	public struct BoneData
 	{
-		public Vector3 m_Rotation;
 		public Vector3 m_Position;
+		public Vector3 m_Rotation;
+		public Vector3 m_Scale;
 	}
 
-	public class AnimationController : MonoBehaviour
+	public class AnimationController : RunnableCoroutine
 	{
-		public Dictionary<RigBodyParts, Transform> m_Bones;
-		public Dictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData;
+		[Header("Animation data")]
+		[ShowInInspector, ReadOnly] public Dictionary<RigBodyParts, Transform> m_Bones;
+
+		// frames number start at 1
+		[ShowInInspector, ReadOnly] public SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData; 
+
+		[Header("Parameters")]
+		public int m_FramesPerSecond = 30;
+		
+		private int m_CurrentFrame = 1;
+		private int m_LastFrameNumber = -1;
+		
+
+		public void Awake()
+		{
+		}
+
+		public IEnumerator RunAnimation()
+		{
+			while(true)
+			{
+				if (m_FrameData.ContainsKey(m_CurrentFrame) || m_CurrentFrame == 1)
+				{
+					var currentFrameData = GetFrameData(m_CurrentFrame);
+					
+					foreach (var rigFrameData in currentFrameData)
+					{
+						var bone = m_Bones[rigFrameData.Key];
+						var boneFrameData = rigFrameData.Value;
+
+						SetBoneData(bone, boneFrameData);
+					}
+				}
+				yield return new WaitForSeconds(1 / m_FramesPerSecond);
+				m_CurrentFrame++;
+			}
+		}
+
+		public Dictionary<RigBodyParts, BoneData> GetFrameData(int frame)
+		{
+			return null;
+		}
+
+		public void SetBoneData(Transform t, BoneData bd)
+		{
+			t.position = bd.m_Position;
+			t.eulerAngles = bd.m_Rotation;
+			t.localScale = bd.m_Scale;
+		}
+
+		public void StartAnimation()
+		{
+
+		}
+
+		public void StopAnimation()
+		{
+
+		}
+
+		/*
+		 * Accepts only fbx file format
+		 * Constructs the m_FrameData structure and sets the m_LastFrameNumber
+		 * m_FrameData has to be ordered by the int 
+		 */
+		public void ReadAnimation(string filename)
+		{
+
+		}
+
 
 	}
 }
