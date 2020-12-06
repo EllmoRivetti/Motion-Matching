@@ -34,11 +34,10 @@ namespace MotionMatching.Animation
 		public Vector3 m_Position;
 	}
 
-
 	public class AnimationController : MonoBehaviour
 	{
 		public Dictionary<RigBodyParts, Transform> m_Bones;
-		public Dictionary<int, Dictionary<RigBodyParts, Transform>> m_FrameData;
+		public Dictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData;
 
 	}
 }
