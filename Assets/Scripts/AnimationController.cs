@@ -59,7 +59,7 @@ namespace MotionMatching.Animation
 			{
 				if (m_FrameData.ContainsKey(m_CurrentFrame) || m_CurrentFrame == 1)
 				{
-					var currentFrameData = GetFrameData(m_CurrentFrame);
+					var currentFrameData = GetBonesDataForFrame(m_CurrentFrame);
 					
 					foreach (var rigFrameData in currentFrameData)
 					{
@@ -72,11 +72,6 @@ namespace MotionMatching.Animation
 				yield return new WaitForSeconds(1 / m_FramesPerSecond);
 				m_CurrentFrame++;
 			}
-		}
-
-		public Dictionary<RigBodyParts, BoneData> GetFrameData(int frame)
-		{
-			return null;
 		}
 
 		public void SetBoneData(Transform t, BoneData bd)
@@ -107,7 +102,7 @@ namespace MotionMatching.Animation
 		}
 
 
-        public Dictionary<RigBodyParts, BoneData> GetBonesDataForFrame(float frameNb)
+        public Dictionary<RigBodyParts, BoneData> GetBonesDataForFrame(int frameNb)
         {
             int firstFrameNb = -1,
                 secondFrameNb = -1;
@@ -166,8 +161,9 @@ namespace MotionMatching.Animation
 
             boneData.m_Rotation = GetInterpolatedValue(firstFrameBoneData.m_Rotation, secondFrameBoneData.m_Rotation, t);
             boneData.m_Position = GetInterpolatedValue(firstFrameBoneData.m_Position, secondFrameBoneData.m_Position, t);
+			boneData.m_Scale	= GetInterpolatedValue(firstFrameBoneData.m_Scale, secondFrameBoneData.m_Scale, t);
 
-            return boneData;
+			return boneData;
         }
 
         public Vector3 GetInterpolatedValue(Vector3 a, Vector3 b, float t)
