@@ -27,19 +27,119 @@ namespace MotionMatching.Animation
 		RIGHT_HAND_RING_PROXIMAL, RIGHT_HAND_RING_INTERMEDIATE, RIGHT_HAND_RING_DISTAL,
 		RIGHT_HAND_LITTLE_PROXIMAL, RIGHT_HAND_LITTLE_INTERMEDIATE, RIGHT_HAND_LITTLE_DISTAL
 	}
-
-	public class BoneData
+	public struct BoneData
 	{
-		public Vector3 m_Rotation;
 		public Vector3 m_Position;
+		public Vector3 m_Rotation;
+		public Vector3 m_Scale;
 	}
 
-	public class AnimationController : MonoBehaviour
+	public class AnimationController : SerializedMonoBehaviour
 	{
-		public Dictionary<RigBodyParts, Transform> m_Bones;
-		public Dictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData;
+		#region Members
+		[Header("Animation data")]
+		[ShowInInspector, ReadOnly] public Dictionary<RigBodyParts, Transform> m_Bones;
 
-        public Dictionary<RigBodyParts, BoneData> GetBonesDataForFrame(float frameNb)
+		// frames number start at 1
+		[ShowInInspector, ReadOnly] public SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData; 
+
+		[Header("Parameters")]
+		public int m_FramesPerSecond = 30;
+
+		[ShowInInspector] protected int m_CurrentFrame = 1;
+		protected int m_LastFrameNumber = -1;
+
+		[Header("Status")]
+		[ShowInInspector, ReadOnly] protected bool m_Run = false;
+		[ShowInInspector, ReadOnly] protected bool m_Pause = false;
+
+		protected IEnumerator m_AnimationCR;
+		protected bool m_AnimationCR_isRunning = false;
+
+		#endregion
+
+		#region Event buttons
+		[Button]
+		public void Run()
+		{
+			if (!m_AnimationCR_isRunning)
+			{
+				m_Run = true;
+				m_AnimationCR = RunAnimation();
+				StartCoroutine(m_AnimationCR);
+				m_AnimationCR_isRunning = true;
+			}
+		}
+		[Button]
+		public void Stop()
+		{
+			try
+			{
+				m_Run = false;
+				StopCoroutine(m_AnimationCR);
+				m_AnimationCR = null;
+				m_AnimationCR_isRunning = false;
+			}
+			catch (UnityException e)
+			{
+				Debug.LogWarning(e.Message);
+			}
+		}
+		[Button]
+		public void Pause()
+		{
+			m_Pause = !m_Pause;
+		}
+		#endregion
+
+		public IEnumerator RunAnimation()
+		{
+			while(m_Run && !m_Pause)
+			{
+				if (!m_Pause)
+				{
+					var currentFrameData = GetBonesDataForFrame(m_CurrentFrame);
+					SetBonesData(currentFrameData);
+					yield return new WaitForSeconds(1 / m_FramesPerSecond);
+					m_CurrentFrame++;
+				}
+				else
+				{
+					yield return new WaitForSeconds(.1f);
+				}
+
+			}
+		}
+
+		/*
+		 * Accepts only fbx file format
+		 * Constructs the m_FrameData structure and sets the m_LastFrameNumber
+		 * m_FrameData has to be ordered by the int 
+		 */
+		public void ReadAnimation(string filename)
+		{
+
+		}
+
+		#region SetOrGetBones
+		public void SetBonesData(Dictionary<RigBodyParts, BoneData> currentFrameData)
+		{
+			foreach (var rigFrameData in currentFrameData)
+			{
+				var bone = m_Bones[rigFrameData.Key];
+				var boneFrameData = rigFrameData.Value;
+
+				SetBoneData(bone, boneFrameData);
+			}
+		}
+		public void SetBoneData(Transform t, BoneData bd)
+		{
+			t.position = bd.m_Position;
+			t.eulerAngles = bd.m_Rotation;
+			t.localScale = bd.m_Scale;
+		}
+
+		public Dictionary<RigBodyParts, BoneData> GetBonesDataForFrame(int frameNb)
         {
             int firstFrameNb = -1,
                 secondFrameNb = -1;
@@ -89,7 +189,6 @@ namespace MotionMatching.Animation
 
             return bonesDataForFrame;
         }
-
         public BoneData GetBoneDataForFrameT(BoneData firstFrameBoneData, BoneData secondFrameBoneData, float firstFrameNb, float secondFrameNb)
         {
             BoneData boneData = new BoneData();
@@ -98,13 +197,14 @@ namespace MotionMatching.Animation
 
             boneData.m_Rotation = GetInterpolatedValue(firstFrameBoneData.m_Rotation, secondFrameBoneData.m_Rotation, t);
             boneData.m_Position = GetInterpolatedValue(firstFrameBoneData.m_Position, secondFrameBoneData.m_Position, t);
+			boneData.m_Scale	= GetInterpolatedValue(firstFrameBoneData.m_Scale, secondFrameBoneData.m_Scale, t);
 
-            return boneData;
+			return boneData;
         }
-
         public Vector3 GetInterpolatedValue(Vector3 a, Vector3 b, float t)
         {
             return Vector3.Lerp(a, b, t);
         }
-    }
+		#endregion
+	}
 }
