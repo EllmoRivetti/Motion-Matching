@@ -146,7 +146,7 @@ public class AnimationReader : MonoBehaviour
         RigBodyPartsRead rigBodyParts;
         Dictionary<RigBodyPartsRead, BoneData> newDic;
 
-        // The extremely consuming task : should go from 1 to frames
+        // the consuming loop
         for (int i = 1; i <= frames; i++)
         {
             currentFrame = (i - 1) * FRAME_SIZE;
@@ -164,28 +164,26 @@ public class AnimationReader : MonoBehaviour
                     boneData = new BoneData();
                     for(int k = 0; k < trs.Length; k++) // trs
                     {
-                        string currentTRS = trs[k].Properties[0].Replace("\"", string.Empty);
+                        string currentTRS = trs[k].Properties[0].Replace("\"", string.Empty); // T or R or S
                         aChannel = trs[k].GetNodeKey("Channel");
                         for(int l = 0; l < aChannel.Length; l++) // xyz
                         {
-                            string currentXYZ = aChannel[l].Properties[0].Replace("\"", string.Empty);
-
-
+                            string currentXYZ = aChannel[l].Properties[0].Replace("\"", string.Empty); // X or Y or Z
                             string[] keys = aChannel[l].GetNodeKey("Key")[0].Properties;
                             bool found = false;
-                            // La boucle qui consomme le plus (puisqu'exécuté plein de fois
-                            for (int m = 0; m < keys.Length; m++)
+
+                            if(keys.Length > 0)
                             {
-                                string[] splitted = keys[m].Split(',');
+                                string[] splitted = keys[0].Split(',');
                                 keyValue = double.Parse(splitted[0]);
                                 if(keyValue == currentFrame)
                                 {
-                                    found = true;
                                     boneData = SetData(boneData, currentTRS, currentXYZ, float.Parse(splitted[1], CultureInfo.InvariantCulture.NumberFormat));
-                                    break;
+                                    aChannel[l].GetNodeKey("Key")[0].Properties = keys.Skip(1).ToArray();
+                                    found = true;
                                 }
+                                
                             }
-
                             if (!found)
                             {
                                 if (i == 1)
@@ -196,22 +194,15 @@ public class AnimationReader : MonoBehaviour
                                     boneData = SetData(boneData, currentTRS, currentXYZ, GetValue(dic, rigBodyParts, currentTRS, currentXYZ, i - 1));
                                 }
                             }
-                            else
-                                aChannel[l].GetNodeKey("Key")[0].Properties = keys.Skip(1).ToArray();
-
-
-
                         }
                     }
                     newDic.Add(rigBodyParts, boneData);
                 }
-
             }
             dic.Add(i, newDic);
         }
         return dic;
     }
-    
     BoneData SetData(BoneData currentData, string trs, string xyz, float value)
     {
         if (trs == "T" && xyz == "X")
@@ -236,7 +227,6 @@ public class AnimationReader : MonoBehaviour
     }
     float GetValue(SortedDictionary<int, Dictionary<RigBodyPartsRead, BoneData>> dic, RigBodyPartsRead r, string trs, string xyz, int frame)
     {
-
         //Debug.Log($"In set data {r} frame {frame} : {trs} {xyz}");
         Dictionary<RigBodyPartsRead, BoneData> currentDic = dic[frame];
         foreach(KeyValuePair<RigBodyPartsRead, BoneData> pair in currentDic)
