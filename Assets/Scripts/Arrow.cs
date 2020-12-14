@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class math : MonoBehaviour
+public class Arrow : MonoBehaviour
 {
 
     [SerializeField] GameObject Hips, RFeet, LFeet, Ground;
@@ -21,18 +21,30 @@ public class math : MonoBehaviour
         Vector3 RFeetDirection = RFeet.transform.forward;
         Vector3 LFeetPosition = LFeet.transform.position;
         Vector3 LFeetDirection = LFeet.transform.forward;
-        HipsPosition.y = (LFeetPosition.y + RFeetPosition.y) / 2;
+
+        Vector2 newHipsPosition = new Vector2(HipsPosition.x, HipsPosition.z);
+        Vector2 newHipsDirection = new Vector2(HipsDirection.x, HipsDirection.z);
+
         drawArrow(HipsPosition, HipsDirection, Color.red);
+        drawArrow(newHipsPosition, newHipsDirection, Color.yellow);
         drawArrow(RFeetPosition, RFeetDirection, Color.blue);
         drawArrow(LFeetPosition, LFeetDirection, Color.green);
-
     }
 
     void drawArrow(Vector3 position,Vector3 direction, Color color)
     {
-        Debug.Log(direction);
         direction.y = 0;
         position.y = Ground.transform.position.y+0.1f;
+        float arrowHeadLength = 0.25f, arrowHeadAngle = 20.0f;
+        Vector3 right = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 180 + arrowHeadAngle, 0) * new Vector3(0, 0, 1);
+        Vector3 left = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 180 - arrowHeadAngle, 0) * new Vector3(0, 0, 1);
+        Debug.DrawRay(position + direction, right * arrowHeadLength, color);
+        Debug.DrawRay(position + direction, left * arrowHeadLength, color);
+        Debug.DrawRay(position, direction, color);
+    }
+
+    void drawArrow(Vector2 position, Vector2 direction, Color color)
+    {
         float arrowHeadLength = 0.25f, arrowHeadAngle = 20.0f;
         Vector3 right = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 180 + arrowHeadAngle, 0) * new Vector3(0, 0, 1);
         Vector3 left = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 180 - arrowHeadAngle, 0) * new Vector3(0, 0, 1);
