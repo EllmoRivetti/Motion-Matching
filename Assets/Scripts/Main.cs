@@ -10,7 +10,6 @@ public class Main : RunnableCoroutine
 {
 	#region Members
 	[Header("Animations data")]
-	public AnimationClipBank m_AnimationBank;
 	private AnimationReader m_AnimationReader;
 	private AnimationController m_AnimationController;
 	#endregion
@@ -22,7 +21,6 @@ public class Main : RunnableCoroutine
 
 		m_AnimationController = GetComponent<AnimationController>();
 		if (!m_AnimationController) Debug.LogError("Please attach an AnimationController to this object", this);
-
 	}
 
 	private void Start()
