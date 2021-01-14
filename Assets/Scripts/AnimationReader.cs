@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using UnityEditor.Experimental.AssetImporters;
 using UnityEngine;
 
 #region TreeParsing
+[Serializable]
 public class Node
 {
     public string Key = String.Empty;
@@ -69,39 +71,10 @@ public class Node
 
 #endregion
 
-public partial class AnimationReader : MonoBehaviour
+public static class AnimationReader
 {
     static readonly double FRAME_SIZE = 1924423250;
-    Node currentNode = null;
-    public string ObjectPath = "";
-
-    void Start()
-    {
-        if (!string.IsNullOrEmpty(ObjectPath))
-        {
-            if (!ObjectPath.Contains("."))
-                ObjectPath += ".fbx";
-            //Debug.Log(Application.dataPath + "/Animations/" + ObjectPath);
-            ReadFile(Application.dataPath + "/Animations/" + ObjectPath);
-
-
-            
-            Dictionary<RigBodyParts, BoneData> a = GetBones(currentNode.GetNodeKey("Objects")[0]);
-            //foreach (KeyValuePair<RigBodyPartsRead, BoneData> e in a)
-            //    Debug.Log("Bone " + e.Key + $" : {e.Value.m_Position} {e.Value.m_Rotation} {e.Value.m_Scale}");
-            DateTime tic = DateTime.Now;
-            SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> b = GetFrameData(currentNode.GetNodeKey("Takes")[0].GetNodeKey("Take")[0]);
-            DateTime toc = DateTime.Now;
-            Debug.Log("Time elapsed : " + (toc - tic).ToString());
-            Debug.Log("Main nodes : " + currentNode);
-            Debug.Log("Bone dic size : " + a.Count);
-            Debug.Log("Sorted dic size : " + b.Count);
-            Debug.Log("Sorted dic 1 size : " + b[1].Count);
-
-        }
-    }
-
-	public SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> GetFrameData(Node takeNode)
+	public static SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> GetFrameData(Node takeNode)
     {
         SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> dic = new SortedDictionary<int, Dictionary<RigBodyParts, BoneData>>();
 
@@ -195,7 +168,7 @@ public partial class AnimationReader : MonoBehaviour
         }
         return dic;
     }
-    BoneData SetData(BoneData currentData, string trs, string xyz, float value)
+    static BoneData SetData(BoneData currentData, string trs, string xyz, float value)
     {
         if (trs == "T" && xyz == "X")
             currentData.m_Position.x = value;
@@ -217,7 +190,7 @@ public partial class AnimationReader : MonoBehaviour
             currentData.m_Scale.z = value;
         return currentData;
     }
-    float GetValue(SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> dic, RigBodyParts r, string trs, string xyz, int frame)
+    static float GetValue(SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> dic, RigBodyParts r, string trs, string xyz, int frame)
     {
         //Debug.Log($"In set data {r} frame {frame} : {trs} {xyz}");
         Dictionary<RigBodyParts, BoneData> currentDic = dic[frame];
@@ -249,7 +222,7 @@ public partial class AnimationReader : MonoBehaviour
         Debug.LogError("Bug GetValue");
         return 0f;
     }
-    Dictionary<RigBodyParts, BoneData> GetBones(Node objectNode)
+    public static Dictionary<RigBodyParts, BoneData> GetBones(Node objectNode)
     {
         Dictionary<RigBodyParts, BoneData> dic = new Dictionary<RigBodyParts, BoneData>();
         Node[] models = objectNode.GetNodeKey("Model");
@@ -294,88 +267,105 @@ public partial class AnimationReader : MonoBehaviour
 
         return dic;
     }
-    RigBodyParts GetRigFromName(string name)
+    static RigBodyParts GetRigFromName(string name)
     {
         if (Enum.IsDefined(typeof(RigBodyParts), name))
             return (RigBodyParts)Enum.Parse(typeof(RigBodyParts), name);
         return RigBodyParts.NOT_FOUND_PART;
     }
-    public Node ReadFile(string path)
+    public static Node ReadFile(string path)
     {
-		currentNode = new Node("root");
-        using (var fileStream = File.OpenRead(path))
+        string[] splitted = path.Split('/');
+        string fileName = splitted[splitted.Length - 1].Split('.')[0];
+        string savePath = Path.Combine(Application.dataPath, "Saves", fileName + ".bin");
+        BinaryFormatter bf = new BinaryFormatter();
+        Node currentNode = new Node(fileName);
+
+        if (!File.Exists(savePath))
         {
-            currentNode = new Node("path");
-            bool waitNextLines = false;
-            using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true))
+            using (var fileStream = File.OpenRead(path))
             {
-                string line;
-                while ((line = streamReader.ReadLine()) != null)
+                bool waitNextLines = false;
+                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true))
                 {
-                    if (!line.Contains(";"))
+                    string line;
+                    while ((line = streamReader.ReadLine()) != null)
                     {
-                        if (line.Contains("{"))
+                        if (!line.Contains(";"))
                         {
-                            if (waitNextLines)
+                            if (line.Contains("{"))
                             {
-                                waitNextLines = false;
+                                if (waitNextLines)
+                                {
+                                    waitNextLines = false;
+                                    currentNode = currentNode.Parent;
+                                }
+                                string cLine = line.Split('{')[0];
+                                List<string> splitPts = new List<string>(cLine.Split(':'));
+
+                                Node p = new Node(splitPts[0]);
+                                if (splitPts.Count >= 2)
+                                    for (int i = 1; i < splitPts.Count; i++)
+                                        if (!string.IsNullOrWhiteSpace(splitPts[i]))
+                                            p.AddProp(splitPts[i].Replace("\t", " ").Trim(' '));
+                                p.Parent = currentNode;
+                                currentNode.AddChild(p);
+                                currentNode = p;
+
+                            }
+                            else if (line.Contains("}"))
+                            {
                                 currentNode = currentNode.Parent;
                             }
-                            string cLine = line.Split('{')[0];
-                            List<string> splitPts = new List<string>(cLine.Split(':'));
-
-                            Node p = new Node(splitPts[0]);
-                            if (splitPts.Count >= 2)
-                                for(int i = 1; i < splitPts.Count; i++)
-                                    if(!string.IsNullOrWhiteSpace(splitPts[i]))
-                                        p.AddProp(splitPts[i].Replace("\t", " ").Trim(' '));
-                            p.Parent = currentNode;
-                            currentNode.AddChild(p);
-                            currentNode = p;
-
-                        }
-                        else if (line.Contains("}"))
-                        {
-                            currentNode = currentNode.Parent;
-                        } 
-                        else if(line.Contains(":"))
-                        {
-                            if (waitNextLines)
+                            else if (line.Contains(":"))
                             {
-                                waitNextLines = false;
-                                currentNode = currentNode.Parent;
+                                if (waitNextLines)
+                                {
+                                    waitNextLines = false;
+                                    currentNode = currentNode.Parent;
+                                }
+                                List<string> splitPts = new List<string>(line.Split(':'));
+                                Node node = new Node(splitPts[0]);
+                                if (splitPts.Count >= 2)
+                                    for (int i = 1; i < splitPts.Count; i++)
+                                        if (!string.IsNullOrWhiteSpace(splitPts[i]))
+                                            node.AddProp(splitPts[i].Replace("\t", " ").Trim(' '));
+                                        else
+                                            waitNextLines = true;
+
+                                node.Parent = currentNode;
+                                currentNode.AddChild(node);
+                                if (waitNextLines)
+                                    currentNode = node;
+
                             }
-                            List<string> splitPts = new List<string>(line.Split(':'));
-                            Node node = new Node(splitPts[0]);
-                            if (splitPts.Count >= 2)
-                                for (int i = 1; i < splitPts.Count; i++)
-                                    if (!string.IsNullOrWhiteSpace(splitPts[i]))
-                                        node.AddProp(splitPts[i].Replace("\t", " ").Trim(' '));
-                            else
-                                waitNextLines = true;
-
-                            node.Parent = currentNode;
-                            currentNode.AddChild(node);
-                            if (waitNextLines)
-                                currentNode = node;
-
-                        }
-                        else if(!string.IsNullOrWhiteSpace(line) && !line.Contains(":") && waitNextLines)
-                        {
-                            currentNode.AddProp(line.Replace("\t", " ").Trim(' '));
+                            else if (!string.IsNullOrWhiteSpace(line) && !line.Contains(":") && waitNextLines)
+                            {
+                                currentNode.AddProp(line.Replace("\t", " ").Trim(' '));
+                            }
                         }
                     }
                 }
             }
+            Node[] tab = new Node[2];
+            tab[0] = currentNode.GetNodeKey("Objects")[0];
+            tab[1] = currentNode.GetNodeKey("Takes")[0];
+            currentNode.Childs = tab;
+
+            FileStream file = File.Create(savePath);
+
+            bf.Serialize(file, currentNode);
+            file.Close();
+            Debug.Log("File saved !");
+        }
+        else
+        {
+            using (FileStream fs = File.OpenRead(savePath))
+                currentNode = (Node)bf.Deserialize(fs);
+            Debug.Log("File loaded from save !");
         }
 
-
-        Node[] tab = new Node[2];
-        tab[0] = currentNode.GetNodeKey("Objects")[0];
-        tab[1] = currentNode.GetNodeKey("Takes")[0];
-        currentNode.Childs = tab;
-
-		return currentNode;
+        return currentNode;
 	}
 
 }
