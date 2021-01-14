@@ -13,6 +13,8 @@ public class Main : RunnableCoroutine
 	public AnimationClipBank m_AnimationBank;
 	private AnimationReader m_AnimationReader;
 	private AnimationController m_AnimationController;
+    [ShowInInspector]
+    private GameObject m_Character;
 	#endregion
 
 	private void Awake()
