@@ -275,6 +275,8 @@ GameObject:
   m_Component:
   - component: {fileID: 603287831}
   - component: {fileID: 603287830}
+  - component: {fileID: 603287832}
+  - component: {fileID: 603287833}
   m_Layer: 0
   m_Name: Main
   m_TagString: Untagged
@@ -321,6 +323,47 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &603287832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 603287829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8b02b2037de23f4e8f83a4602ff34d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectPath: 01_09.fbx
+--- !u!114 &603287833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 603287829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6c4b0918df1fea4a845ca2aa98c5a5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: m_Bones
+      Entry: 6
+      Data: 
+    - Name: m_FrameData
+      Entry: 6
+      Data: 
+  m_FramesPerSecond: 30
 --- !u!1 &677737722
 GameObject:
   m_ObjectHideFlags: 0
@@ -1050,7 +1093,6 @@ MonoBehaviour:
   Hips: {fileID: 2063662745}
   RFeet: {fileID: 1475795426}
   LFeet: {fileID: 1720525329}
-  Ground: {fileID: 2146520083}
 --- !u!136 &2079202623
 CapsuleCollider:
   m_ObjectHideFlags: 0
