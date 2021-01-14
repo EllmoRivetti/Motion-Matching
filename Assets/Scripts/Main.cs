@@ -12,6 +12,8 @@ public class Main : RunnableCoroutine
 	[Header("Animations data")]
 	private AnimationReader m_AnimationReader;
 	private AnimationController m_AnimationController;
+    [ShowInInspector]
+    private GameObject m_Character;
 	#endregion
 
 	private void Awake()

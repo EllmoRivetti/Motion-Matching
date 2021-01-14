@@ -123,6 +123,21 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 23800000, guid: ace181b56fe8d3349855463265069f39, type: 2}
+--- !u!4 &12450316 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -2389525917609993686, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &23862033 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4747904710347621765, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &50714015 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6803169544883306252, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &98617558
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,6 +280,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &215234164 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2563496969622287784, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &324537922 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -2072040086291044643, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &331320270 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1330755669629619180, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &465169786 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1189529853000058984, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &490953051 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -3746190272939815206, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &603287829
 GameObject:
   m_ObjectHideFlags: 0
@@ -351,19 +391,615 @@ MonoBehaviour:
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
-    ReferencedUnityObjects: []
+    ReferencedUnityObjects:
+    - {fileID: 2063662746}
+    - {fileID: 1121879037}
+    - {fileID: 2047472062}
+    - {fileID: 1422642992}
+    - {fileID: 215234164}
+    - {fileID: 1380247826}
+    - {fileID: 1841700448}
+    - {fileID: 2111544575}
+    - {fileID: 1678997545}
+    - {fileID: 734094205}
+    - {fileID: 1345647242}
+    - {fileID: 1165379299}
+    - {fileID: 1159495070}
+    - {fileID: 653444521}
+    - {fileID: 465169786}
+    - {fileID: 1038828804}
+    - {fileID: 50714015}
+    - {fileID: 1206899602}
+    - {fileID: 1926241229}
+    - {fileID: 1772235063}
+    - {fileID: 1986857090}
+    - {fileID: 331320270}
+    - {fileID: 1027469286}
+    - {fileID: 1294019329}
+    - {fileID: 12450316}
+    - {fileID: 1649191517}
+    - {fileID: 704911949}
+    - {fileID: 23862033}
+    - {fileID: 1269412452}
+    - {fileID: 1513027102}
+    - {fileID: 490953051}
+    - {fileID: 1475795427}
+    - {fileID: 623065210}
+    - {fileID: 324537922}
+    - {fileID: 1720525330}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes:
     - Name: m_Bones
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[RigBodyParts, Assembly-CSharp],[UnityEngine.Transform,
+        UnityEngine.CoreModule]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.EnumEqualityComparer`1[[RigBodyParts, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 44
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 0
+    - Name: $v
       Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 1
+    - Name: $v
+      Entry: 10
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 2
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 3
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 4
+    - Name: $v
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 5
+    - Name: $v
+      Entry: 10
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 6
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 7
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 8
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 9
+    - Name: $v
+      Entry: 10
+      Data: 3
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 10
+    - Name: $v
+      Entry: 10
+      Data: 4
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 11
+    - Name: $v
+      Entry: 10
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 12
+    - Name: $v
+      Entry: 10
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 13
+    - Name: $v
+      Entry: 10
+      Data: 7
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 14
+    - Name: $v
+      Entry: 10
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 15
+    - Name: $v
+      Entry: 10
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 16
+    - Name: $v
+      Entry: 10
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 17
+    - Name: $v
+      Entry: 10
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 18
+    - Name: $v
+      Entry: 10
+      Data: 12
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 19
+    - Name: $v
+      Entry: 10
+      Data: 13
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 20
+    - Name: $v
+      Entry: 10
+      Data: 14
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 21
+    - Name: $v
+      Entry: 10
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 22
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 23
+    - Name: $v
+      Entry: 10
+      Data: 16
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 24
+    - Name: $v
+      Entry: 10
+      Data: 17
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 25
+    - Name: $v
+      Entry: 10
+      Data: 18
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 26
+    - Name: $v
+      Entry: 10
+      Data: 19
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 27
+    - Name: $v
+      Entry: 10
+      Data: 20
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 28
+    - Name: $v
+      Entry: 10
+      Data: 21
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 29
+    - Name: $v
+      Entry: 10
+      Data: 22
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 30
+    - Name: $v
+      Entry: 10
+      Data: 23
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 31
+    - Name: $v
+      Entry: 10
+      Data: 24
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 32
+    - Name: $v
+      Entry: 10
+      Data: 25
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 33
+    - Name: $v
+      Entry: 10
+      Data: 26
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 34
+    - Name: $v
+      Entry: 10
+      Data: 27
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 35
+    - Name: $v
+      Entry: 10
+      Data: 28
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 36
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 37
+    - Name: $v
+      Entry: 10
+      Data: 29
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 38
+    - Name: $v
+      Entry: 10
+      Data: 30
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 39
+    - Name: $v
+      Entry: 10
+      Data: 31
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 40
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 41
+    - Name: $v
+      Entry: 10
+      Data: 32
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 42
+    - Name: $v
+      Entry: 10
+      Data: 33
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 43
+    - Name: $v
+      Entry: 10
+      Data: 34
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: m_FrameData
       Entry: 6
       Data: 
   m_FramesPerSecond: 30
+--- !u!4 &623065210 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2559285840627121667, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &653444521 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -2899422035419094908, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &677737722
 GameObject:
   m_ObjectHideFlags: 0
@@ -407,6 +1043,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &704911949 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1564860333797465651, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -499,6 +1140,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 44.64, y: -64.044, z: -25.395}
+--- !u!4 &734094205 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -5480977901411583989, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &889298983
 GameObject:
   m_ObjectHideFlags: 0
@@ -677,9 +1323,74 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 28.76, y: 0, z: 0}
+--- !u!4 &1027469286 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7666680083751660616, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1038828804 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5372056943023685468, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1121879037 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6515712193588681746, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1159495070 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -104578136787704052, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1165379299 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6341119541397085964, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1206899602 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -1812909498023395591, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1269412452 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6655383506977046455, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1294019329 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8255111157037086696, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1345647242 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3667946887678727147, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1380247826 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1852576806548013000, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1422642992 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7078722787440015773, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1475795426 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -751476226918971245, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1475795427 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 608321761475470972, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1513027102 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8169382868667117632, guid: bad187a12c831be458464e1326171251, type: 3}
   m_PrefabInstance: {fileID: 1820324150}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1569213056
@@ -777,9 +1488,29 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1569213056}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &1649191517 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -2594260964506120097, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1678997545 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -1070350730909333850, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1720525329 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2084811680363313996, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1720525330 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6874584590210671055, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1772235063 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5048025441337412694, guid: bad187a12c831be458464e1326171251, type: 3}
   m_PrefabInstance: {fileID: 1820324150}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1820324150
@@ -892,6 +1623,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bad187a12c831be458464e1326171251, type: 3}
   m_PrefabInstance: {fileID: 1820324150}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1841700448 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8447082967072642302, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1926241229 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6502182839619065283, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1986857090 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6857788192064577062, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2038455829
 GameObject:
   m_ObjectHideFlags: 0
@@ -987,9 +1733,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2038455829}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &2047472062 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -3321919801592875672, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2063662745 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1082271958561512970, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2063662746 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5465940246521907071, guid: bad187a12c831be458464e1326171251, type: 3}
   m_PrefabInstance: {fileID: 1820324150}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2079202615
@@ -1107,6 +1863,11 @@ CapsuleCollider:
   m_Height: 1.9002787
   m_Direction: 1
   m_Center: {x: 0, y: 0.3798167, z: 0}
+--- !u!4 &2111544575 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -870823317777057635, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2146520083
 GameObject:
   m_ObjectHideFlags: 0
