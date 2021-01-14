@@ -11,7 +11,7 @@ using UnityEditor.Experimental.AssetImporters;
 using UnityEngine;
 
 #region TreeParsing
-class Node
+public class Node
 {
     public string Key = String.Empty;
     public string[] Properties = new string[0];
@@ -69,16 +69,8 @@ class Node
 
 #endregion
 
-public class AnimationReader : MonoBehaviour
+public partial class AnimationReader : MonoBehaviour
 {
-    public enum RigBodyPartsRead
-    {
-        NOT_FOUND_PART,
-        hip, abdomen, chest, neck, head, leftEye, rightEye, rCollar, rShldr, rForeArm, rHand, rThumb1, rThumb2, rIndex1, rIndex2,
-        rMid1, rMid2, rRing1, rRing2, rPinky1,
-        rPinky2, lCollar, lShldr, lForeArm, lHand, lThumb1, lThumb2, lIndex1, lIndex2,
-        lMid1, lMid2, lRing1, lRing2, lPinky1, lPinky2, rButtock, rThigh, rShin, rFoot, lButtock, lThigh, lShin, lFoot
-    }
     static readonly double FRAME_SIZE = 1924423250;
     Node currentNode = null;
     public string ObjectPath = "";
@@ -94,11 +86,11 @@ public class AnimationReader : MonoBehaviour
 
 
             
-            Dictionary<RigBodyPartsRead, BoneData> a = GetBones(currentNode.GetNodeKey("Objects")[0]);
+            Dictionary<RigBodyParts, BoneData> a = GetBones(currentNode.GetNodeKey("Objects")[0]);
             //foreach (KeyValuePair<RigBodyPartsRead, BoneData> e in a)
             //    Debug.Log("Bone " + e.Key + $" : {e.Value.m_Position} {e.Value.m_Rotation} {e.Value.m_Scale}");
             DateTime tic = DateTime.Now;
-            SortedDictionary<int, Dictionary<RigBodyPartsRead, BoneData>> b = GetFrameData(currentNode.GetNodeKey("Takes")[0].GetNodeKey("Take")[0]);
+            SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> b = GetFrameData(currentNode.GetNodeKey("Takes")[0].GetNodeKey("Take")[0]);
             DateTime toc = DateTime.Now;
             Debug.Log("Time elapsed : " + (toc - tic).ToString());
             Debug.Log("Main nodes : " + currentNode);
@@ -109,9 +101,9 @@ public class AnimationReader : MonoBehaviour
         }
     }
 
-    SortedDictionary<int, Dictionary<RigBodyPartsRead, BoneData>> GetFrameData(Node takeNode)
+	public SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> GetFrameData(Node takeNode)
     {
-        SortedDictionary<int, Dictionary<RigBodyPartsRead, BoneData>> dic = new SortedDictionary<int, Dictionary<RigBodyPartsRead, BoneData>>();
+        SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> dic = new SortedDictionary<int, Dictionary<RigBodyParts, BoneData>>();
 
         double keyValue;
         Node[] models, trs, aChannel;
@@ -143,21 +135,21 @@ public class AnimationReader : MonoBehaviour
         Debug.Log(frames);
         double currentFrame;
         BoneData boneData;
-        RigBodyPartsRead rigBodyParts;
-        Dictionary<RigBodyPartsRead, BoneData> newDic;
+        RigBodyParts rigBodyParts;
+        Dictionary<RigBodyParts, BoneData> newDic;
 
         // the consuming loop
         for (int i = 1; i <= frames; i++)
         {
             currentFrame = (i - 1) * FRAME_SIZE;
 
-            newDic = new Dictionary<RigBodyPartsRead, BoneData>();
+            newDic = new Dictionary<RigBodyParts, BoneData>();
             models = takeNode.GetNodeKey("Model");
             for(int j = 0; j < models.Length; j++)
             {
                 rigBodyParts = GetRigFromName(models[j].Properties[1].Split('\"')[0]);
                 //Debug.Log(rigBodyParts); // DEBUG
-                if(rigBodyParts != RigBodyPartsRead.NOT_FOUND_PART)
+                if(rigBodyParts != RigBodyParts.NOT_FOUND_PART)
                 {
                     Node channel = models[j].GetNodeKey("Channel")[0];
                     trs = channel.GetNodeKey("Channel");
@@ -225,11 +217,11 @@ public class AnimationReader : MonoBehaviour
             currentData.m_Scale.z = value;
         return currentData;
     }
-    float GetValue(SortedDictionary<int, Dictionary<RigBodyPartsRead, BoneData>> dic, RigBodyPartsRead r, string trs, string xyz, int frame)
+    float GetValue(SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> dic, RigBodyParts r, string trs, string xyz, int frame)
     {
         //Debug.Log($"In set data {r} frame {frame} : {trs} {xyz}");
-        Dictionary<RigBodyPartsRead, BoneData> currentDic = dic[frame];
-        foreach(KeyValuePair<RigBodyPartsRead, BoneData> pair in currentDic)
+        Dictionary<RigBodyParts, BoneData> currentDic = dic[frame];
+        foreach(KeyValuePair<RigBodyParts, BoneData> pair in currentDic)
         {
             if(pair.Key == r)
             {
@@ -257,15 +249,15 @@ public class AnimationReader : MonoBehaviour
         Debug.LogError("Bug GetValue");
         return 0f;
     }
-    Dictionary<RigBodyPartsRead, BoneData> GetBones(Node objectNode)
+    Dictionary<RigBodyParts, BoneData> GetBones(Node objectNode)
     {
-        Dictionary<RigBodyPartsRead, BoneData> dic = new Dictionary<RigBodyPartsRead, BoneData>();
+        Dictionary<RigBodyParts, BoneData> dic = new Dictionary<RigBodyParts, BoneData>();
         Node[] models = objectNode.GetNodeKey("Model");
         for(int i = 0; i < models.Length; i++)
         {
             string part = models[i].Properties[1].Split('\"')[0];
-            RigBodyPartsRead enumPart = GetRigFromName(part);
-            if (enumPart != RigBodyPartsRead.NOT_FOUND_PART)
+            RigBodyParts enumPart = GetRigFromName(part);
+            if (enumPart != RigBodyParts.NOT_FOUND_PART)
             {
                 Node properties = models[i].GetNodeKey("Properties60")[0];
                 Node[] props = properties.GetNodeKey("Property");
@@ -302,14 +294,15 @@ public class AnimationReader : MonoBehaviour
 
         return dic;
     }
-    RigBodyPartsRead GetRigFromName(string name)
+    RigBodyParts GetRigFromName(string name)
     {
-        if (Enum.IsDefined(typeof(RigBodyPartsRead), name))
-            return (RigBodyPartsRead)Enum.Parse(typeof(RigBodyPartsRead), name);
-        return RigBodyPartsRead.NOT_FOUND_PART;
+        if (Enum.IsDefined(typeof(RigBodyParts), name))
+            return (RigBodyParts)Enum.Parse(typeof(RigBodyParts), name);
+        return RigBodyParts.NOT_FOUND_PART;
     }
-    void ReadFile(string path)
+    public Node ReadFile(string path)
     {
+		currentNode = new Node("root");
         using (var fileStream = File.OpenRead(path))
         {
             currentNode = new Node("path");
@@ -381,6 +374,8 @@ public class AnimationReader : MonoBehaviour
         tab[0] = currentNode.GetNodeKey("Objects")[0];
         tab[1] = currentNode.GetNodeKey("Takes")[0];
         currentNode.Childs = tab;
-    }
+
+		return currentNode;
+	}
 
 }
