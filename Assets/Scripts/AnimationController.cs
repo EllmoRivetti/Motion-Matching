@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
@@ -57,6 +58,19 @@ namespace MotionMatching.Animation
 		protected bool m_AnimationCR_isRunning = false;
 
 		#endregion
+
+
+		private void OnValidate()
+		{
+			if (m_Bones == null)
+			{
+				m_Bones = new Dictionary<RigBodyParts, Transform>();
+				foreach (RigBodyParts value in Enum.GetValues(typeof(RigBodyParts)))
+				{
+					m_Bones[value] = null;
+				}
+			}
+		}
 
 		#region Event buttons
 		[Button]
