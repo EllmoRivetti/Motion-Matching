@@ -1,10 +1,12 @@
-﻿using MotionMatching.Animation;
+﻿using Assets.Helpers;
+using MotionMatching.Animation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
@@ -74,98 +76,135 @@ public class Node
 public static class AnimationReader
 {
     static readonly double FRAME_SIZE = 1924423250;
-	public static SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> GetFrameData(Node takeNode)
+	public static SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> GetFrameData(string path, bool forceRead = false)
     {
+        #region FileStuff
+        string[] sp = path.Split('/');
+        string fileName = sp[sp.Length - 1].Split('.')[0];
+        string savePath = Path.Combine(Application.dataPath, "Saves", fileName + ".bin");
+        BinaryFormatter bf = new BinaryFormatter();
+        SurrogateSelector ss = new SurrogateSelector();
+
+        Vector3SerializationSurrogate v3_ss = new Vector3SerializationSurrogate();
+        ss.AddSurrogate(typeof(Vector3), new StreamingContext(StreamingContextStates.All), v3_ss);
+        bf.SurrogateSelector = ss;
+        #endregion
+
         SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> dic = new SortedDictionary<int, Dictionary<RigBodyParts, BoneData>>();
 
-        double keyValue;
-        Node[] models, trs, aChannel;
-        #region GetFramesCount
-        double highestKeyCount = 0;
-        foreach (Node model in takeNode.GetNodeKey("Model"))
+        if (File.Exists(savePath) && !forceRead)
         {
-            Node channel = model.GetNodeKey("Channel")[0];
-            trs = channel.GetNodeKey("Channel");
-            for (int i = 0; i < trs.Length; i++) //trs
+            using (FileStream fs = File.OpenRead(savePath))
+                dic = (SortedDictionary<int, Dictionary<RigBodyParts, BoneData>>)bf.Deserialize(fs);
+            //Debug.Log("File loaded from save !");
+        } else
+        {
+            Node takeNode = ReadFile(path);
+
+            double keyValue;
+            Node[] models, trs, aChannel;
+            #region GetFramesCount
+            double highestKeyCount = 0;
+            foreach (Node model in takeNode.GetNodeKey("Model"))
             {
-                aChannel = trs[i].GetNodeKey("Channel");
-                for (int j = 0; j < aChannel.Length; j++) //xyz
+                Node channel = model.GetNodeKey("Channel")[0];
+                trs = channel.GetNodeKey("Channel");
+                for (int i = 0; i < trs.Length; i++) //trs
                 {
-                    string[] keys = aChannel[j].GetNodeKey("Key")[0].Properties;
-                    for(int k = 0; k < keys.Length; k++)
+                    aChannel = trs[i].GetNodeKey("Channel");
+                    for (int j = 0; j < aChannel.Length; j++) //xyz
                     {
-                        keyValue = double.Parse(keys[k].Split(',')[0]);
-                        if (keyValue > highestKeyCount)
-                            highestKeyCount = keyValue;
+                        string[] keys = aChannel[j].GetNodeKey("Key")[0].Properties;
+                        for (int k = 0; k < keys.Length; k++)
+                        {
+                            keyValue = double.Parse(keys[k].Split(',')[0]);
+                            if (keyValue > highestKeyCount)
+                                highestKeyCount = keyValue;
+                        }
                     }
                 }
             }
-        }
-        #endregion
+            #endregion
 
-        // 1 + to start from 1
-        int frames = 1 + (int)(highestKeyCount / FRAME_SIZE);
-        Debug.Log(frames);
-        double currentFrame;
-        BoneData boneData;
-        RigBodyParts rigBodyParts;
-        Dictionary<RigBodyParts, BoneData> newDic;
+            #region inits
+            // 1 + to start from 1
+            int frames = 1 + (int)(highestKeyCount / FRAME_SIZE);
+            Debug.Log(frames);
+            double currentFrame;
+            BoneData boneData;
+            RigBodyParts rigBodyParts;
+            Dictionary<RigBodyParts, BoneData> newDic;
+            #endregion
 
-        // the consuming loop
-        for (int i = 1; i <= frames; i++)
-        {
-            currentFrame = (i - 1) * FRAME_SIZE;
-
-            newDic = new Dictionary<RigBodyParts, BoneData>();
-            models = takeNode.GetNodeKey("Model");
-            for(int j = 0; j < models.Length; j++)
+            // the consuming loop
+            for (int i = 1; i <= frames; i++)
             {
-                rigBodyParts = GetRigFromName(models[j].Properties[1].Split('\"')[0]);
-                //Debug.Log(rigBodyParts); // DEBUG
-                if(rigBodyParts != RigBodyParts.NOT_FOUND_PART)
-                {
-                    Node channel = models[j].GetNodeKey("Channel")[0];
-                    trs = channel.GetNodeKey("Channel");
-                    boneData = new BoneData();
-                    for(int k = 0; k < trs.Length; k++) // trs
-                    {
-                        string currentTRS = trs[k].Properties[0].Replace("\"", string.Empty); // T or R or S
-                        aChannel = trs[k].GetNodeKey("Channel");
-                        for(int l = 0; l < aChannel.Length; l++) // xyz
-                        {
-                            string currentXYZ = aChannel[l].Properties[0].Replace("\"", string.Empty); // X or Y or Z
-                            string[] keys = aChannel[l].GetNodeKey("Key")[0].Properties;
-                            bool found = false;
+                currentFrame = (i - 1) * FRAME_SIZE;
 
-                            if(keys.Length > 0)
+                newDic = new Dictionary<RigBodyParts, BoneData>();
+                models = takeNode.GetNodeKey("Model");
+                for (int j = 0; j < models.Length; j++)
+                {
+                    rigBodyParts = GetRigFromName(models[j].Properties[1].Split('\"')[0]);
+                    //Debug.Log(rigBodyParts); // DEBUG
+                    if (rigBodyParts != RigBodyParts.NOT_FOUND_PART)
+                    {
+                        Node channel = models[j].GetNodeKey("Channel")[0];
+                        trs = channel.GetNodeKey("Channel");
+                        boneData = new BoneData();
+                        for (int k = 0; k < trs.Length; k++) // trs
+                        {
+                            string currentTRS = trs[k].Properties[0].Replace("\"", string.Empty); // T or R or S
+                            aChannel = trs[k].GetNodeKey("Channel");
+                            for (int l = 0; l < aChannel.Length; l++) // xyz
                             {
-                                string[] splitted = keys[0].Split(',');
-                                keyValue = double.Parse(splitted[0]);
-                                if(keyValue == currentFrame)
+                                string currentXYZ = aChannel[l].Properties[0].Replace("\"", string.Empty); // X or Y or Z
+                                string[] keys = aChannel[l].GetNodeKey("Key")[0].Properties;
+                                bool found = false;
+
+                                if (keys.Length > 0)
                                 {
-                                    boneData = SetData(boneData, currentTRS, currentXYZ, float.Parse(splitted[1], CultureInfo.InvariantCulture.NumberFormat));
-                                    aChannel[l].GetNodeKey("Key")[0].Properties = keys.Skip(1).ToArray();
-                                    found = true;
+                                    string[] splitted = keys[0].Split(',');
+                                    keyValue = double.Parse(splitted[0]);
+                                    if (keyValue == currentFrame)
+                                    {
+                                        boneData = SetData(boneData, currentTRS, currentXYZ, float.Parse(splitted[1], CultureInfo.InvariantCulture.NumberFormat));
+                                        aChannel[l].GetNodeKey("Key")[0].Properties = keys.Skip(1).ToArray();
+                                        found = true;
+                                    }
+
                                 }
-                                
-                            }
-                            if (!found)
-                            {
-                                if (i == 1)
-                                    boneData = SetData(boneData, currentTRS, currentXYZ, float.Parse(aChannel[l].GetNodeKey("Default")[0].Properties[0], CultureInfo.InvariantCulture.NumberFormat));
-                                else
+                                if (!found)
                                 {
-                                    //Debug.Log(rigBodyParts + " : " + currentTRS + " " + currentXYZ);
-                                    boneData = SetData(boneData, currentTRS, currentXYZ, GetValue(dic, rigBodyParts, currentTRS, currentXYZ, i - 1));
+                                    if (i == 1)
+                                        boneData = SetData(boneData, currentTRS, currentXYZ, float.Parse(aChannel[l].GetNodeKey("Default")[0].Properties[0], CultureInfo.InvariantCulture.NumberFormat));
+                                    else
+                                    {
+                                        //Debug.Log(rigBodyParts + " : " + currentTRS + " " + currentXYZ);
+                                        boneData = SetData(boneData, currentTRS, currentXYZ, GetValue(dic, rigBodyParts, currentTRS, currentXYZ, i - 1));
+                                    }
                                 }
                             }
                         }
+                        newDic.Add(rigBodyParts, boneData);
                     }
-                    newDic.Add(rigBodyParts, boneData);
                 }
+                dic.Add(i, newDic);
             }
-            dic.Add(i, newDic);
+
+            #region SaveFile
+            FileStream file = File.Create(savePath);
+
+
+
+            bf.Serialize(file, dic);
+            file.Close();
+            #endregion
+
         }
+
+
+
         return dic;
     }
     static BoneData SetData(BoneData currentData, string trs, string xyz, float value)
@@ -222,147 +261,84 @@ public static class AnimationReader
         Debug.LogError("Bug GetValue");
         return 0f;
     }
-    public static Dictionary<RigBodyParts, BoneData> GetBones(Node objectNode)
-    {
-        Dictionary<RigBodyParts, BoneData> dic = new Dictionary<RigBodyParts, BoneData>();
-        Node[] models = objectNode.GetNodeKey("Model");
-        for(int i = 0; i < models.Length; i++)
-        {
-            string part = models[i].Properties[1].Split('\"')[0];
-            RigBodyParts enumPart = GetRigFromName(part);
-            if (enumPart != RigBodyParts.NOT_FOUND_PART)
-            {
-                Node properties = models[i].GetNodeKey("Properties60")[0];
-                Node[] props = properties.GetNodeKey("Property");
-                Vector3 t = Vector3.zero;
-                Vector3 r = Vector3.zero;
-                Vector3 s = Vector3.zero;
-                for(int j = 0; j < props.Length; j++)
-                {
-                    if (props[j].Properties[0].Contains("Lcl Translation"))
-                    {
-                        List<string> strs = new List<string>(props[j].Properties[0].Split(','));
-                        t = new Vector3(float.Parse(strs[3], CultureInfo.InvariantCulture.NumberFormat), float.Parse(strs[4], CultureInfo.InvariantCulture.NumberFormat), float.Parse(strs[5], CultureInfo.InvariantCulture.NumberFormat));
-                    }
-                    if (props[j].Properties[0].Contains("Lcl Rotation"))
-                    {
-                        List<string> strs = new List<string>(props[j].Properties[0].Split(','));
-                        r = new Vector3(float.Parse(strs[3], CultureInfo.InvariantCulture.NumberFormat), float.Parse(strs[4], CultureInfo.InvariantCulture.NumberFormat), float.Parse(strs[5], CultureInfo.InvariantCulture.NumberFormat));
-                    }
-                    if (props[j].Properties[0].Contains("Lcl Scaling"))
-                    {
-                        List<string> strs = new List<string>(props[j].Properties[0].Split(','));
-                        s = new Vector3(float.Parse(strs[3], CultureInfo.InvariantCulture.NumberFormat), float.Parse(strs[4], CultureInfo.InvariantCulture.NumberFormat), float.Parse(strs[5], CultureInfo.InvariantCulture.NumberFormat));
-                    }
-                }
-                BoneData bone = new BoneData();
-                bone.m_Position = t;
-                bone.m_Rotation = r;
-                bone.m_Scale = s;
-                  
-                dic.Add(enumPart, bone);
-            }
-        }
-
-
-        return dic;
-    }
+    
     static RigBodyParts GetRigFromName(string name)
     {
         if (Enum.IsDefined(typeof(RigBodyParts), name))
             return (RigBodyParts)Enum.Parse(typeof(RigBodyParts), name);
         return RigBodyParts.NOT_FOUND_PART;
     }
-    public static Node ReadFile(string path)
+    static Node ReadFile(string path)
     {
         string[] splitted = path.Split('/');
         string fileName = splitted[splitted.Length - 1].Split('.')[0];
-        string savePath = Path.Combine(Application.dataPath, "Saves", fileName + ".bin");
-        BinaryFormatter bf = new BinaryFormatter();
+
         Node currentNode = new Node(fileName);
 
-        if (!File.Exists(savePath))
+        using (var fileStream = File.OpenRead(path))
         {
-            using (var fileStream = File.OpenRead(path))
+            bool waitNextLines = false;
+            using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true))
             {
-                bool waitNextLines = false;
-                using (var streamReader = new StreamReader(fileStream, Encoding.UTF8, true))
+                string line;
+                while ((line = streamReader.ReadLine()) != null)
                 {
-                    string line;
-                    while ((line = streamReader.ReadLine()) != null)
+                    if (!line.Contains(";"))
                     {
-                        if (!line.Contains(";"))
+                        if (line.Contains("{"))
                         {
-                            if (line.Contains("{"))
+                            if (waitNextLines)
                             {
-                                if (waitNextLines)
-                                {
-                                    waitNextLines = false;
-                                    currentNode = currentNode.Parent;
-                                }
-                                string cLine = line.Split('{')[0];
-                                List<string> splitPts = new List<string>(cLine.Split(':'));
-
-                                Node p = new Node(splitPts[0]);
-                                if (splitPts.Count >= 2)
-                                    for (int i = 1; i < splitPts.Count; i++)
-                                        if (!string.IsNullOrWhiteSpace(splitPts[i]))
-                                            p.AddProp(splitPts[i].Replace("\t", " ").Trim(' '));
-                                p.Parent = currentNode;
-                                currentNode.AddChild(p);
-                                currentNode = p;
-
-                            }
-                            else if (line.Contains("}"))
-                            {
+                                waitNextLines = false;
                                 currentNode = currentNode.Parent;
                             }
-                            else if (line.Contains(":"))
-                            {
-                                if (waitNextLines)
-                                {
-                                    waitNextLines = false;
-                                    currentNode = currentNode.Parent;
-                                }
-                                List<string> splitPts = new List<string>(line.Split(':'));
-                                Node node = new Node(splitPts[0]);
-                                if (splitPts.Count >= 2)
-                                    for (int i = 1; i < splitPts.Count; i++)
-                                        if (!string.IsNullOrWhiteSpace(splitPts[i]))
-                                            node.AddProp(splitPts[i].Replace("\t", " ").Trim(' '));
-                                        else
-                                            waitNextLines = true;
+                            string cLine = line.Split('{')[0];
+                            List<string> splitPts = new List<string>(cLine.Split(':'));
 
-                                node.Parent = currentNode;
-                                currentNode.AddChild(node);
-                                if (waitNextLines)
-                                    currentNode = node;
+                            Node p = new Node(splitPts[0]);
+                            if (splitPts.Count >= 2)
+                                for (int i = 1; i < splitPts.Count; i++)
+                                    if (!string.IsNullOrWhiteSpace(splitPts[i]))
+                                        p.AddProp(splitPts[i].Replace("\t", " ").Trim(' '));
+                            p.Parent = currentNode;
+                            currentNode.AddChild(p);
+                            currentNode = p;
 
-                            }
-                            else if (!string.IsNullOrWhiteSpace(line) && !line.Contains(":") && waitNextLines)
+                        }
+                        else if (line.Contains("}"))
+                        {
+                            currentNode = currentNode.Parent;
+                        }
+                        else if (line.Contains(":"))
+                        {
+                            if (waitNextLines)
                             {
-                                currentNode.AddProp(line.Replace("\t", " ").Trim(' '));
+                                waitNextLines = false;
+                                currentNode = currentNode.Parent;
                             }
+                            List<string> splitPts = new List<string>(line.Split(':'));
+                            Node node = new Node(splitPts[0]);
+                            if (splitPts.Count >= 2)
+                                for (int i = 1; i < splitPts.Count; i++)
+                                    if (!string.IsNullOrWhiteSpace(splitPts[i]))
+                                        node.AddProp(splitPts[i].Replace("\t", " ").Trim(' '));
+                                    else
+                                        waitNextLines = true;
+
+                            node.Parent = currentNode;
+                            currentNode.AddChild(node);
+                            if (waitNextLines)
+                                currentNode = node;
+
+                        }
+                        else if (!string.IsNullOrWhiteSpace(line) && !line.Contains(":") && waitNextLines)
+                        {
+                            currentNode.AddProp(line.Replace("\t", " ").Trim(' '));
                         }
                     }
                 }
             }
-            Node[] tab = new Node[2];
-            tab[0] = currentNode.GetNodeKey("Objects")[0];
-            tab[1] = currentNode.GetNodeKey("Takes")[0];
-            currentNode.Childs = tab;
-
-            FileStream file = File.Create(savePath);
-
-            bf.Serialize(file, currentNode);
-            file.Close();
-            Debug.Log("File saved !");
-        }
-        else
-        {
-            using (FileStream fs = File.OpenRead(savePath))
-                currentNode = (Node)bf.Deserialize(fs);
-            Debug.Log("File loaded from save !");
+            currentNode = currentNode.GetNodeKey("Takes")[0].GetNodeKey("Take")[0];
         }
 
         return currentNode;

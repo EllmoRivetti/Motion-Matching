@@ -28,6 +28,7 @@ namespace MotionMatching.Animation
 	//	RIGHT_HAND_RING_PROXIMAL, RIGHT_HAND_RING_INTERMEDIATE, RIGHT_HAND_RING_DISTAL,
 	//	RIGHT_HAND_LITTLE_PROXIMAL, RIGHT_HAND_LITTLE_INTERMEDIATE, RIGHT_HAND_LITTLE_DISTAL
 	//}
+	[Serializable]
 	public struct BoneData
 	{
 		public Vector3 m_Position;
