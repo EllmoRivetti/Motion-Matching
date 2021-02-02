@@ -28,8 +28,7 @@ public class Main : RunnableCoroutine
 
 	private void InitFrameData()
 	{
-		var node = AnimationReader.ReadFile("Assets/Animations/01_09.fbx");
-		var animationData = AnimationReader.GetFrameData(node.GetNodeKey("Takes")[0].GetNodeKey("Take")[0]);
+		var animationData = AnimationReader.GetFrameData("Assets/Animations/01_09.fbx");
 		print(animationData);
 		m_AnimationController.BindAnimationData(animationData);
 		print("Successfully binded animation data");
