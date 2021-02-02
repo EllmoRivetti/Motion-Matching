@@ -62,6 +62,7 @@ namespace MotionMatching.Animation
 
 		private void OnValidate()
 		{
+			//  Bind bones
 			if (m_Bones == null)
 			{
 				m_Bones = new Dictionary<RigBodyParts, Transform>();
@@ -70,6 +71,10 @@ namespace MotionMatching.Animation
 					m_Bones[value] = null;
 				}
 			}
+			// Swap frame
+			var frameData = GetBonesDataForFrame(m_CurrentFrame);
+			if (frameData != null)
+				SetBonesData(frameData);
 		}
 
 		#region Event buttons
@@ -106,15 +111,34 @@ namespace MotionMatching.Animation
 		}
 		#endregion
 
+		private void RemoveNullBonesFromMBones()
+		{
+			if (!Application.isPlaying)
+			{
+				Debug.LogError("Please enter play mode to run this method!");
+				return;
+			}
+			List<RigBodyParts> bones = new List<RigBodyParts>();
+			foreach (var bone in m_Bones)
+			{
+				if (bone.Value == null)
+				{
+					bones.Add(bone.Key);
+				}
+			}
+			bones.ForEach(x => m_Bones.Remove(x));
+		}
+
 		private IEnumerator RunAnimation()
 		{
-			while(m_Run && !m_Pause)
+			RemoveNullBonesFromMBones();
+			while (m_Run && !m_Pause)
 			{
 				if (!m_Pause)
 				{
 					var currentFrameData = GetBonesDataForFrame(m_CurrentFrame);
 					SetBonesData(currentFrameData);
-					yield return new WaitForSeconds(1 / m_FramesPerSecond);
+					yield return new WaitForSeconds(1.0f / (float)m_FramesPerSecond);
 					m_CurrentFrame++;
 				}
 				else
@@ -138,17 +162,38 @@ namespace MotionMatching.Animation
 		#region SetOrGetBones
 		public void SetBonesData(Dictionary<RigBodyParts, BoneData> currentFrameData)
 		{
-			foreach (var rigFrameData in currentFrameData)
+			foreach (var kvpBone in m_Bones)
 			{
-				var bone = m_Bones[rigFrameData.Key];
-				var boneFrameData = rigFrameData.Value;
+				var bone = kvpBone.Value;
+				var boneType = kvpBone.Key;
 
-				SetBoneData(bone, boneFrameData);
+				if (bone == null)
+				{
+					print("Cant set bonedata of " + boneType.ToString());
+				}
+				else
+				{
+					var boneFrameData = currentFrameData[boneType];
+					SetBoneData(bone, boneFrameData);
+				}
 			}
+			// foreach (var rigFrameData in currentFrameData)
+			// {
+			// 	var bone = m_Bones[rigFrameData.Key];
+			// 	var boneFrameData = rigFrameData.Value;
+			// 	if (bone == null)
+            //     {
+			// 		print("Cant set bonedata of " + rigFrameData.Key.ToString());
+            //     }
+            //     else
+			// 	{
+			// 		SetBoneData(bone, boneFrameData);
+			// 	}
+			// }
 		}
 		public void SetBoneData(Transform t, BoneData bd)
 		{
-			t.position = bd.m_Position;
+			t.position = bd.m_Position / 10.0f;
 			t.eulerAngles = bd.m_Rotation;
 			t.localScale = bd.m_Scale;
 		}
