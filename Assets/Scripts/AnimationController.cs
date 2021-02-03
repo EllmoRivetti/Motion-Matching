@@ -1,32 +1,34 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
 namespace MotionMatching.Animation
 {
-	public enum RigBodyParts
-	{
-		HIPS, SPINE, CHEST, UPPER_CHEST,
-		LEFT_ARM_SHOULDER, LEFT_ARM_UPPER, LEFT_ARM_LOWER, LEFT_ARM_HAND,
-		RIGHT_ARM_SHOULDER, RIGHT_ARM_UPPER, RIGHT_ARM_LOWER, RIGHT_ARM_HAND,
-		LEFT_LEG_UPPER, LEFT_LEG_LOWER, LEFT_LEG_FOOT, LEFT_LEG_TOES,
-		RIGHT_LEG_UPPER, RIGHT_LEG_LOWER, RIGHT_LEG_FOOT, RIGHT_LEG_TOES,
+	//public enum RigBodyParts
+	//{
+	//	HIPS, SPINE, CHEST, UPPER_CHEST,
+	//	LEFT_ARM_SHOULDER, LEFT_ARM_UPPER, LEFT_ARM_LOWER, LEFT_ARM_HAND,
+	//	RIGHT_ARM_SHOULDER, RIGHT_ARM_UPPER, RIGHT_ARM_LOWER, RIGHT_ARM_HAND,
+	//	LEFT_LEG_UPPER, LEFT_LEG_LOWER, LEFT_LEG_FOOT, LEFT_LEG_TOES,
+	//	RIGHT_LEG_UPPER, RIGHT_LEG_LOWER, RIGHT_LEG_FOOT, RIGHT_LEG_TOES,
 
-		HEAD_NECK, HEAD_HEAD, HEAD_LEFT_EYE, HEAD_RIGHT_EYE, HEAD_JAW,
+	//	HEAD_NECK, HEAD_HEAD, HEAD_LEFT_EYE, HEAD_RIGHT_EYE, HEAD_JAW,
 
-		LEFT_HAND_THUMB_PROXIMAL, LEFT_HAND_THUMB_INTERMEDIATE, LEFT_HAND_THUMB_DISTAL,
-		LEFT_HAND_INDEX_PROXIMAL, LEFT_HAND_INDEX_INTERMEDIATE, LEFT_HAND_INDEX_DISTAL,
-		LEFT_HAND_MIDDLE_PROXIMAL, LEFT_HAND_MIDDLE_INTERMEDIATE, LEFT_HAND_MIDDLE_DISTAL,
-		LEFT_HAND_RING_PROXIMAL, LEFT_HAND_RING_INTERMEDIATE, LEFT_HAND_RING_DISTAL,
-		LEFT_HAND_LITTLE_PROXIMAL, LEFT_HAND_LITTLE_INTERMEDIATE, LEFT_HAND_LITTLE_DISTAL,
+	//	LEFT_HAND_THUMB_PROXIMAL, LEFT_HAND_THUMB_INTERMEDIATE, LEFT_HAND_THUMB_DISTAL,
+	//	LEFT_HAND_INDEX_PROXIMAL, LEFT_HAND_INDEX_INTERMEDIATE, LEFT_HAND_INDEX_DISTAL,
+	//	LEFT_HAND_MIDDLE_PROXIMAL, LEFT_HAND_MIDDLE_INTERMEDIATE, LEFT_HAND_MIDDLE_DISTAL,
+	//	LEFT_HAND_RING_PROXIMAL, LEFT_HAND_RING_INTERMEDIATE, LEFT_HAND_RING_DISTAL,
+	//	LEFT_HAND_LITTLE_PROXIMAL, LEFT_HAND_LITTLE_INTERMEDIATE, LEFT_HAND_LITTLE_DISTAL,
 
-		RIGHT_HAND_THUMB_PROXIMAL, RIGHT_HAND_THUMB_INTERMEDIATE, RIGHT_HAND_THUMB_DISTAL,
-		RIGHT_HAND_INDEX_PROXIMAL, RIGHT_HAND_INDEX_INTERMEDIATE, RIGHT_HAND_INDEX_DISTAL,
-		RIGHT_HAND_MIDDLE_PROXIMAL, RIGHT_HAND_MIDDLE_INTERMEDIATE, RIGHT_HAND_MIDDLE_DISTAL,
-		RIGHT_HAND_RING_PROXIMAL, RIGHT_HAND_RING_INTERMEDIATE, RIGHT_HAND_RING_DISTAL,
-		RIGHT_HAND_LITTLE_PROXIMAL, RIGHT_HAND_LITTLE_INTERMEDIATE, RIGHT_HAND_LITTLE_DISTAL
-	}
+	//	RIGHT_HAND_THUMB_PROXIMAL, RIGHT_HAND_THUMB_INTERMEDIATE, RIGHT_HAND_THUMB_DISTAL,
+	//	RIGHT_HAND_INDEX_PROXIMAL, RIGHT_HAND_INDEX_INTERMEDIATE, RIGHT_HAND_INDEX_DISTAL,
+	//	RIGHT_HAND_MIDDLE_PROXIMAL, RIGHT_HAND_MIDDLE_INTERMEDIATE, RIGHT_HAND_MIDDLE_DISTAL,
+	//	RIGHT_HAND_RING_PROXIMAL, RIGHT_HAND_RING_INTERMEDIATE, RIGHT_HAND_RING_DISTAL,
+	//	RIGHT_HAND_LITTLE_PROXIMAL, RIGHT_HAND_LITTLE_INTERMEDIATE, RIGHT_HAND_LITTLE_DISTAL
+	//}
+	[Serializable]
 	public struct BoneData
 	{
 		public Vector3 m_Position;
@@ -38,7 +40,7 @@ namespace MotionMatching.Animation
 	{
 		#region Members
 		[Header("Animation data")]
-		[ShowInInspector, ReadOnly] public Dictionary<RigBodyParts, Transform> m_Bones;
+		[ShowInInspector] public Dictionary<RigBodyParts, Transform> m_Bones;
 
 		// frames number start at 1
 		[ShowInInspector, ReadOnly] public SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData; 
@@ -57,6 +59,24 @@ namespace MotionMatching.Animation
 		protected bool m_AnimationCR_isRunning = false;
 
 		#endregion
+
+
+		private void OnValidate()
+		{
+			//  Bind bones
+			if (m_Bones == null)
+			{
+				m_Bones = new Dictionary<RigBodyParts, Transform>();
+				foreach (RigBodyParts value in Enum.GetValues(typeof(RigBodyParts)))
+				{
+					m_Bones[value] = null;
+				}
+			}
+			// Swap frame
+			var frameData = GetBonesDataForFrame(m_CurrentFrame);
+			if (frameData != null)
+				SetBonesData(frameData);
+		}
 
 		#region Event buttons
 		[Button]
@@ -92,15 +112,34 @@ namespace MotionMatching.Animation
 		}
 		#endregion
 
-		public IEnumerator RunAnimation()
+		private void RemoveNullBonesFromMBones()
 		{
-			while(m_Run && !m_Pause)
+			if (!Application.isPlaying)
+			{
+				Debug.LogError("Please enter play mode to run this method!");
+				return;
+			}
+			List<RigBodyParts> bones = new List<RigBodyParts>();
+			foreach (var bone in m_Bones)
+			{
+				if (bone.Value == null)
+				{
+					bones.Add(bone.Key);
+				}
+			}
+			bones.ForEach(x => m_Bones.Remove(x));
+		}
+
+		private IEnumerator RunAnimation()
+		{
+			RemoveNullBonesFromMBones();
+			while (m_Run && !m_Pause)
 			{
 				if (!m_Pause)
 				{
 					var currentFrameData = GetBonesDataForFrame(m_CurrentFrame);
 					SetBonesData(currentFrameData);
-					yield return new WaitForSeconds(1 / m_FramesPerSecond);
+					yield return new WaitForSeconds(1.0f / (float)m_FramesPerSecond);
 					m_CurrentFrame++;
 				}
 				else
@@ -116,25 +155,46 @@ namespace MotionMatching.Animation
 		 * Constructs the m_FrameData structure and sets the m_LastFrameNumber
 		 * m_FrameData has to be ordered by the int 
 		 */
-		public void ReadAnimation(string filename)
+		public void BindAnimationData(SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> animation)
 		{
-
+			m_FrameData = animation;
 		}
 
 		#region SetOrGetBones
 		public void SetBonesData(Dictionary<RigBodyParts, BoneData> currentFrameData)
 		{
-			foreach (var rigFrameData in currentFrameData)
+			foreach (var kvpBone in m_Bones)
 			{
-				var bone = m_Bones[rigFrameData.Key];
-				var boneFrameData = rigFrameData.Value;
+				var bone = kvpBone.Value;
+				var boneType = kvpBone.Key;
 
-				SetBoneData(bone, boneFrameData);
+				if (bone == null)
+				{
+					print("Cant set bonedata of " + boneType.ToString());
+				}
+				else
+				{
+					var boneFrameData = currentFrameData[boneType];
+					SetBoneData(bone, boneFrameData);
+				}
 			}
+			// foreach (var rigFrameData in currentFrameData)
+			// {
+			// 	var bone = m_Bones[rigFrameData.Key];
+			// 	var boneFrameData = rigFrameData.Value;
+			// 	if (bone == null)
+            //     {
+			// 		print("Cant set bonedata of " + rigFrameData.Key.ToString());
+            //     }
+            //     else
+			// 	{
+			// 		SetBoneData(bone, boneFrameData);
+			// 	}
+			// }
 		}
 		public void SetBoneData(Transform t, BoneData bd)
 		{
-			t.position = bd.m_Position;
+			t.position = bd.m_Position / 10.0f;
 			t.eulerAngles = bd.m_Rotation;
 			t.localScale = bd.m_Scale;
 		}
