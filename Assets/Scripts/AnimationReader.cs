@@ -162,13 +162,20 @@ public static class AnimationReader
                                 string[] keys = aChannel[l].GetNodeKey("Key")[0].Properties;
                                 bool found = false;
 
+                                // float defaultValue = float.Parse(aChannel[l].GetNodeKey("Default")[0].Properties[0], CultureInfo.InvariantCulture.NumberFormat);
+                                // Debug.Log(defaultValue);
                                 if (keys.Length > 0)
                                 {
                                     string[] splitted = keys[0].Split(',');
                                     keyValue = double.Parse(splitted[0]);
                                     if (keyValue == currentFrame)
                                     {
-                                        boneData = SetData(boneData, currentTRS, currentXYZ, float.Parse(splitted[1], CultureInfo.InvariantCulture.NumberFormat));
+                                        boneData = SetData(
+                                            boneData, 
+                                            currentTRS, 
+                                            currentXYZ, 
+                                            float.Parse(splitted[1], CultureInfo.InvariantCulture.NumberFormat)
+                                        );
                                         aChannel[l].GetNodeKey("Key")[0].Properties = keys.Skip(1).ToArray();
                                         found = true;
                                     }
@@ -216,17 +223,17 @@ public static class AnimationReader
         if (trs == "T" && xyz == "Z")
             currentData.m_Position.z = value;
         if (trs == "R" && xyz == "X")
-            currentData.m_Rotation.x = value;
+            currentData.m_EulerAngles.x = value;
         if (trs == "R" && xyz == "Y")
-            currentData.m_Rotation.y = value;
+            currentData.m_EulerAngles.y = value;
         if (trs == "R" && xyz == "Z")
-            currentData.m_Rotation.z = value;
+            currentData.m_EulerAngles.z = value;
         if (trs == "S" && xyz == "X")
-            currentData.m_Scale.x = value;
+            currentData.m_LocalScale.x = value;
         if (trs == "S" && xyz == "Y")
-            currentData.m_Scale.y = value;
+            currentData.m_LocalScale.y = value;
         if (trs == "S" && xyz == "Z")
-            currentData.m_Scale.z = value;
+            currentData.m_LocalScale.z = value;
         return currentData;
     }
     static float GetValue(SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> dic, RigBodyParts r, string trs, string xyz, int frame)
@@ -245,17 +252,17 @@ public static class AnimationReader
                 if (trs == "T" && xyz == "Z")
                     return pair.Value.m_Position.z;
                 if (trs == "R" && xyz == "X")
-                    return pair.Value.m_Rotation.x;
+                    return pair.Value.m_EulerAngles.x;
                 if (trs == "R" && xyz == "Y")
-                    return pair.Value.m_Rotation.y;
+                    return pair.Value.m_EulerAngles.y;
                 if (trs == "R" && xyz == "Z")
-                    return pair.Value.m_Rotation.z;
+                    return pair.Value.m_EulerAngles.z;
                 if (trs == "S" && xyz == "X")
-                    return pair.Value.m_Scale.x;
+                    return pair.Value.m_LocalScale.x;
                 if (trs == "S" && xyz == "Y")
-                    return pair.Value.m_Scale.y;
+                    return pair.Value.m_LocalScale.y;
                 if (trs == "S" && xyz == "Z")
-                    return pair.Value.m_Scale.z;
+                    return pair.Value.m_LocalScale.z;
             }
         }
         Debug.LogError("Bug GetValue");

@@ -10,8 +10,9 @@ public class Main : RunnableCoroutine
 	#region Members
 	[Header("Animations data")]
 	private AnimationController m_AnimationController;
-    [ShowInInspector]
-    private GameObject m_Character;
+	public UnityAnimationConverter m_AnimationConverter;
+    public LoadedAnimationFile m_AnimationToUse;
+	public string filename = "";
 	#endregion
 
 	private void Awake()
@@ -23,15 +24,38 @@ public class Main : RunnableCoroutine
 	private void Start()
 	{
 		s_OnUpdateEvents += TraceExecTime;
-		InitFrameData();
 	}
 
-	private void InitFrameData()
+
+
+
+	[Button]
+	public void LoadAnimationFromFBXFile()
+    {
+		if (m_AnimationToUse)
+        {
+			m_AnimationToUse.m_FrameData = AnimationReader.GetFrameData(filename);
+			print("Successfully loaded animation data");
+		}
+
+	}
+
+	[Button]
+	public void LoadAnimationFromUnity(string animationPath)
+    {
+		m_AnimationConverter.Create(animationPath);
+		while (!m_AnimationConverter.CanRetrieveLoadedAnimationFile()) ;
+		m_AnimationToUse = m_AnimationConverter.file;
+
+		Debug.Log("Created LoadedAnimationFile at " + animationPath);
+	}
+
+	[Button]
+	private void BindFrameData()
 	{
-		var animationData = AnimationReader.GetFrameData("Assets/Animations/01_09.fbx");
-		print(animationData);
-		m_AnimationController.BindAnimationData(animationData);
-		print("Successfully binded animation data");
+		m_AnimationController.BindAnimationData(m_AnimationToUse.m_FrameData);
+		// m_AnimationController.FixDefaultPosition();
+		print("Successfully binded animation data to controller");
 	}
 
 	private float m_tmp_timeSinceStart = 0.0f;

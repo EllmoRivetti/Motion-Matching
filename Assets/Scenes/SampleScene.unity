@@ -123,6 +123,32 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 23800000, guid: ace181b56fe8d3349855463265069f39, type: 2}
+--- !u!1 &10537257 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &10537258 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &10537259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 10537257}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95a6d9f876ac5b7409228c5036850646, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BonesMatching: {fileID: 11400000, guid: 1b4f1a1e45de83e4a8bc50a27b54bb9a, type: 2}
+  file: {fileID: 11400000, guid: c2da8bd06ef01e5459f0dc497c7cbaef, type: 2}
+  playerAnimator: {fileID: 10537258}
+  m_AnimationSpeedMultiplicator: 2
 --- !u!4 &12450316 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -2389525917609993686, guid: bad187a12c831be458464e1326171251, type: 3}
@@ -155,7 +181,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!120 &98617559
 LineRenderer:
   m_ObjectHideFlags: 0
@@ -295,6 +321,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1330755669629619180, guid: bad187a12c831be458464e1326171251, type: 3}
   m_PrefabInstance: {fileID: 1820324150}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &350986182 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 366175167995203695, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &465169786 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1189529853000058984, guid: bad187a12c831be458464e1326171251, type: 3}
@@ -347,6 +378,9 @@ MonoBehaviour:
   m_UpdateDeltaTime: 0.5
   m_Run: 1
   m_Pause: 0
+  m_AnimationConverter: {fileID: 10537259}
+  m_AnimationToUse: {fileID: 11400000, guid: c2da8bd06ef01e5459f0dc497c7cbaef, type: 2}
+  filename: Assets/Animations/143_12.fbx
 --- !u!4 &603287831
 Transform:
   m_ObjectHideFlags: 0
@@ -355,7 +389,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 603287829}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.6254168, y: 1.5386999, z: 0.39399588}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -378,9 +412,12 @@ MonoBehaviour:
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 2063662746}
+    - {fileID: 951413342}
+    - {fileID: 350986182}
     - {fileID: 1121879037}
     - {fileID: 2047472062}
     - {fileID: 1422642992}
+    - {fileID: 646912314}
     - {fileID: 215234164}
     - {fileID: 1380247826}
     - {fileID: 1841700448}
@@ -394,6 +431,7 @@ MonoBehaviour:
     - {fileID: 465169786}
     - {fileID: 1038828804}
     - {fileID: 50714015}
+    - {fileID: 1334599550}
     - {fileID: 1206899602}
     - {fileID: 1926241229}
     - {fileID: 1772235063}
@@ -468,30 +506,6 @@ MonoBehaviour:
       Entry: 3
       Data: 2
     - Name: $v
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 3
-    - Name: $v
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 4
-    - Name: $v
       Entry: 10
       Data: 1
     - Name: 
@@ -502,7 +516,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 5
+      Data: 3
     - Name: $v
       Entry: 10
       Data: 2
@@ -514,43 +528,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 6
-    - Name: $v
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 7
-    - Name: $v
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 8
-    - Name: $v
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 9
+      Data: 4
     - Name: $v
       Entry: 10
       Data: 3
@@ -562,7 +540,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 10
+      Data: 5
     - Name: $v
       Entry: 10
       Data: 4
@@ -574,139 +552,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 11
-    - Name: $v
-      Entry: 10
-      Data: 5
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 12
-    - Name: $v
-      Entry: 10
       Data: 6
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 13
-    - Name: $v
-      Entry: 10
-      Data: 7
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 14
-    - Name: $v
-      Entry: 10
-      Data: 8
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 15
-    - Name: $v
-      Entry: 10
-      Data: 9
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 16
-    - Name: $v
-      Entry: 10
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 17
-    - Name: $v
-      Entry: 10
-      Data: 11
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 18
-    - Name: $v
-      Entry: 10
-      Data: 12
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 19
-    - Name: $v
-      Entry: 10
-      Data: 13
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 20
-    - Name: $v
-      Entry: 10
-      Data: 14
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 21
-    - Name: $v
-      Entry: 10
-      Data: 15
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 3
-      Data: 22
     - Name: $v
       Entry: 6
       Data: 
@@ -718,7 +564,151 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 23
+      Data: 7
+    - Name: $v
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 8
+    - Name: $v
+      Entry: 10
+      Data: 5
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 9
+    - Name: $v
+      Entry: 10
+      Data: 6
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 10
+    - Name: $v
+      Entry: 10
+      Data: 7
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 11
+    - Name: $v
+      Entry: 10
+      Data: 8
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 12
+    - Name: $v
+      Entry: 10
+      Data: 9
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 13
+    - Name: $v
+      Entry: 10
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 14
+    - Name: $v
+      Entry: 10
+      Data: 11
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 15
+    - Name: $v
+      Entry: 10
+      Data: 12
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 16
+    - Name: $v
+      Entry: 10
+      Data: 13
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 17
+    - Name: $v
+      Entry: 10
+      Data: 14
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 18
+    - Name: $v
+      Entry: 10
+      Data: 15
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 19
     - Name: $v
       Entry: 10
       Data: 16
@@ -730,7 +720,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 24
+      Data: 20
     - Name: $v
       Entry: 10
       Data: 17
@@ -742,7 +732,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 25
+      Data: 21
     - Name: $v
       Entry: 10
       Data: 18
@@ -754,7 +744,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 26
+      Data: 22
     - Name: $v
       Entry: 10
       Data: 19
@@ -766,7 +756,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 27
+      Data: 23
     - Name: $v
       Entry: 10
       Data: 20
@@ -778,7 +768,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 28
+      Data: 24
     - Name: $v
       Entry: 10
       Data: 21
@@ -790,7 +780,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 29
+      Data: 25
     - Name: $v
       Entry: 10
       Data: 22
@@ -802,7 +792,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 30
+      Data: 26
     - Name: $v
       Entry: 10
       Data: 23
@@ -814,7 +804,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 31
+      Data: 27
     - Name: $v
       Entry: 10
       Data: 24
@@ -826,7 +816,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 32
+      Data: 28
     - Name: $v
       Entry: 10
       Data: 25
@@ -838,7 +828,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 33
+      Data: 29
     - Name: $v
       Entry: 10
       Data: 26
@@ -850,7 +840,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 34
+      Data: 30
     - Name: $v
       Entry: 10
       Data: 27
@@ -862,10 +852,58 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 3
-      Data: 35
+      Data: 31
     - Name: $v
       Entry: 10
       Data: 28
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 32
+    - Name: $v
+      Entry: 10
+      Data: 29
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 33
+    - Name: $v
+      Entry: 10
+      Data: 30
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 34
+    - Name: $v
+      Entry: 10
+      Data: 31
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 3
+      Data: 35
+    - Name: $v
+      Entry: 10
+      Data: 32
     - Name: 
       Entry: 8
       Data: 
@@ -889,7 +927,7 @@ MonoBehaviour:
       Data: 37
     - Name: $v
       Entry: 10
-      Data: 29
+      Data: 33
     - Name: 
       Entry: 8
       Data: 
@@ -901,7 +939,7 @@ MonoBehaviour:
       Data: 38
     - Name: $v
       Entry: 10
-      Data: 30
+      Data: 34
     - Name: 
       Entry: 8
       Data: 
@@ -913,7 +951,7 @@ MonoBehaviour:
       Data: 39
     - Name: $v
       Entry: 10
-      Data: 31
+      Data: 35
     - Name: 
       Entry: 8
       Data: 
@@ -937,7 +975,7 @@ MonoBehaviour:
       Data: 41
     - Name: $v
       Entry: 10
-      Data: 32
+      Data: 36
     - Name: 
       Entry: 8
       Data: 
@@ -949,7 +987,7 @@ MonoBehaviour:
       Data: 42
     - Name: $v
       Entry: 10
-      Data: 33
+      Data: 37
     - Name: 
       Entry: 8
       Data: 
@@ -961,7 +999,7 @@ MonoBehaviour:
       Data: 43
     - Name: $v
       Entry: 10
-      Data: 34
+      Data: 38
     - Name: 
       Entry: 8
       Data: 
@@ -974,10 +1012,16 @@ MonoBehaviour:
     - Name: m_FrameData
       Entry: 6
       Data: 
+  bonesMatching: {fileID: 11400000, guid: 1b4f1a1e45de83e4a8bc50a27b54bb9a, type: 2}
   m_FramesPerSecond: 30
 --- !u!4 &623065210 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2559285840627121667, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &646912314 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6000407479487422213, guid: bad187a12c831be458464e1326171251, type: 3}
   m_PrefabInstance: {fileID: 1820324150}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &653444521 stripped
@@ -1001,7 +1045,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &677737723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1225,6 +1269,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 889298983}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &951413342 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8021001004253913084, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -1346,6 +1395,11 @@ Transform:
 --- !u!4 &1294019329 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8255111157037086696, guid: bad187a12c831be458464e1326171251, type: 3}
+  m_PrefabInstance: {fileID: 1820324150}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1334599550 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -3432401550182100168, guid: bad187a12c831be458464e1326171251, type: 3}
   m_PrefabInstance: {fileID: 1820324150}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1345647242 stripped
@@ -1597,12 +1651,47 @@ PrefabInstance:
       propertyPath: m_Name
       value: mixamorig:LeftToe
       objectReference: {fileID: 0}
+    - target: {fileID: 5465940246521907071, guid: bad187a12c831be458464e1326171251, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.282
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465940246521907071, guid: bad187a12c831be458464e1326171251, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.064
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465940246521907071, guid: bad187a12c831be458464e1326171251, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.0000032228656
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465940246521907071, guid: bad187a12c831be458464e1326171251, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.122423336
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465940246521907071, guid: bad187a12c831be458464e1326171251, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.00002293083
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465940246521907071, guid: bad187a12c831be458464e1326171251, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.992478
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465940246521907071, guid: bad187a12c831be458464e1326171251, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 14.064
+      objectReference: {fileID: 0}
+    - target: {fileID: 5465940246521907071, guid: bad187a12c831be458464e1326171251, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -0.003
+      objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: bad187a12c831be458464e1326171251, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 71fa800ced2e71e48815b7358a0a7231, type: 2}
-    m_RemovedComponents:
-    - {fileID: 5866666021909216657, guid: bad187a12c831be458464e1326171251, type: 3}
+      objectReference: {fileID: 9100000, guid: db15b3f7536a09d449ea261e69cb84c2, type: 2}
+    - target: {fileID: 5866666021909216657, guid: bad187a12c831be458464e1326171251, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bad187a12c831be458464e1326171251, type: 3}
 --- !u!4 &1820324151 stripped
 Transform:
@@ -1764,7 +1853,7 @@ Transform:
   m_GameObject: {fileID: 2079202615}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.33804315, y: 0.7158206, z: -0.1841203}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 10, y: 10, z: 10}
   m_Children:
   - {fileID: 1820324151}
   m_Father: {fileID: 0}
@@ -1869,7 +1958,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2146520084
 Transform:
   m_ObjectHideFlags: 0

@@ -32,8 +32,8 @@ namespace MotionMatching.Animation
 	public struct BoneData
 	{
 		public Vector3 m_Position;
-		public Vector3 m_Rotation;
-		public Vector3 m_Scale;
+		public Vector3 m_EulerAngles;
+		public Vector3 m_LocalScale;
 	}
 
 	public class AnimationController : SerializedMonoBehaviour
@@ -41,6 +41,8 @@ namespace MotionMatching.Animation
 		#region Members
 		[Header("Animation data")]
 		[ShowInInspector] public Dictionary<RigBodyParts, Transform> m_Bones;
+
+		public BonesMatching bonesMatching;
 
 		// frames number start at 1
 		[ShowInInspector, ReadOnly] public SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData; 
@@ -60,6 +62,11 @@ namespace MotionMatching.Animation
 
 		#endregion
 
+		[Button]
+		public void CopyBonesMatching()
+        {
+			bonesMatching.m_Bones = m_Bones;
+		}
 
 		private void OnValidate()
 		{
@@ -73,9 +80,12 @@ namespace MotionMatching.Animation
 				}
 			}
 			// Swap frame
-			var frameData = GetBonesDataForFrame(m_CurrentFrame);
-			if (frameData != null)
-				SetBonesData(frameData);
+			if (Application.isPlaying)
+            {
+				var frameData = GetBonesDataForFrame(m_CurrentFrame);
+				if (frameData != null)
+					SetBonesData(frameData);
+            }
 		}
 
 		#region Event buttons
@@ -132,8 +142,10 @@ namespace MotionMatching.Animation
 
 		private IEnumerator RunAnimation()
 		{
-			RemoveNullBonesFromMBones();
-			while (m_Run && !m_Pause)
+			if (!Application.isPlaying) yield return null;
+
+			// RemoveNullBonesFromMBones();
+			while (m_Run && !m_Pause && m_CurrentFrame <= m_FrameData.Count)
 			{
 				if (!m_Pause)
 				{
@@ -157,8 +169,41 @@ namespace MotionMatching.Animation
 		 */
 		public void BindAnimationData(SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> animation)
 		{
+			// m_FrameData = new SortedDictionary<int, Dictionary<RigBodyParts, BoneData>>();
+			// int limit = -1;
+			// foreach (var kvp in animation)
+			// {
+			//  if (limit == -1) 
+			// 	 	break;
+			// 	m_FrameData.Add(kvp.Key, kvp.Value);
+			//  limit--;
+            // }
 			m_FrameData = animation;
 		}
+		public void FixDefaultPosition()
+        {
+			var firstFrame = m_FrameData[1];
+			for(int i = 2; i < m_FrameData.Count; ++i)
+            {
+				if (m_FrameData.ContainsKey(i))
+                {
+					var currentFrame = m_FrameData[i];
+					List<RigBodyParts> keys = new List<RigBodyParts>(currentFrame.Keys);
+					foreach (RigBodyParts currentBoneName in keys)
+                    {
+						BoneData currentBoneObject = currentFrame[currentBoneName];
+						BoneData firstFrameBoneObject = firstFrame[currentBoneName];
+
+						currentBoneObject.m_Position = (currentBoneObject.m_Position - firstFrameBoneObject.m_Position) * .1f;
+						m_FrameData[i][currentBoneName] = currentBoneObject;
+						// currentBoneObject.m_Rotation -= firstFrameBoneObject.m_Rotation;
+						// currentBoneObject.m_Scale -= firstFrameBoneObject.m_Scale;
+
+
+					}
+				}
+            }
+        }
 
 		#region SetOrGetBones
 		public void SetBonesData(Dictionary<RigBodyParts, BoneData> currentFrameData)
@@ -168,14 +213,14 @@ namespace MotionMatching.Animation
 				var bone = kvpBone.Value;
 				var boneType = kvpBone.Key;
 
-				if (bone == null)
-				{
-					print("Cant set bonedata of " + boneType.ToString());
-				}
-				else
+				if (bone != null)
 				{
 					var boneFrameData = currentFrameData[boneType];
 					SetBoneData(bone, boneFrameData);
+				}
+				else
+				{
+					// print("Cant set bonedata of " + boneType.ToString());
 				}
 			}
 			// foreach (var rigFrameData in currentFrameData)
@@ -194,60 +239,77 @@ namespace MotionMatching.Animation
 		}
 		public void SetBoneData(Transform t, BoneData bd)
 		{
-			t.position = bd.m_Position / 10.0f;
-			t.eulerAngles = bd.m_Rotation;
-			t.localScale = bd.m_Scale;
+			t.position= bd.m_Position;
+			t.eulerAngles = bd.m_EulerAngles;
+			t.localScale = bd.m_LocalScale;
 		}
 
 		public Dictionary<RigBodyParts, BoneData> GetBonesDataForFrame(int frameNb)
         {
-            int firstFrameNb = -1,
-                secondFrameNb = -1;
+			if (m_FrameData == null) return null;
 
-            Dictionary<RigBodyParts, BoneData> firstFrameBonesData  = new Dictionary<RigBodyParts, BoneData>(),
-                                               secondFrameBonesData = new Dictionary<RigBodyParts, BoneData>();
+			// print("GetBonesDataForFrame: " + frameNb);
+			// print(m_FrameData.ContainsKey(frameNb));
+			//Return value
+			Dictionary <RigBodyParts, BoneData> interpolatedFrame = new Dictionary<RigBodyParts, BoneData>();
+			int firstFrame = -1, nextFrame = -1;
 
-            //Return value
-            Dictionary<RigBodyParts, BoneData> bonesDataForFrame = new Dictionary<RigBodyParts, BoneData>(); 
+			foreach (int i in m_FrameData.Keys)
+			{
+				if (i < frameNb)
+				{
+					if (firstFrame == -1 && nextFrame == -1)
+					{
+						firstFrame = i;
+						nextFrame = i;
+					}
+					else
+					{
+						firstFrame = i;
+					}
+				}
+				else if (i > frameNb)
+				{
+					nextFrame = i;
+					break;
+				}
+				else// frameNb == bonesData.key
+				{
+					return m_FrameData[i];
+				}
+			}
 
+			// Debug.Log ("Searching:" + frameNb);
+			// print("Found: " + firstFrame);
+			// print("Next: " + nextFrame);
 
-            foreach (KeyValuePair<int, Dictionary<RigBodyParts, BoneData>> bonesData in m_FrameData)
-            {
-                if(bonesData.Key < frameNb)
-                {
-                    if(firstFrameNb == -1 && secondFrameNb == -1)
-                    {
-                        firstFrameNb = bonesData.Key;
-                        firstFrameBonesData = bonesData.Value;
+			var firstFrameData = m_FrameData[firstFrame];
+			var nextFrameData = m_FrameData[nextFrame];
 
-                        secondFrameNb = bonesData.Key;
-                        secondFrameBonesData = bonesData.Value;
-                    }
-                    else
-                    {
-                        firstFrameNb = bonesData.Key;
-                        firstFrameBonesData = bonesData.Value;
-                    }
-                }
-                else if (bonesData.Key > frameNb)
-                {
-                    secondFrameNb = bonesData.Key;
-                    secondFrameBonesData = bonesData.Value;
-                    break;
-                }
-                else// frameNb == bonesData.key
-                {
-                    return bonesData.Value;
-                }
-            }
+			if (firstFrameData == null || nextFrameData == null)
+				Debug.LogError("Something went wrong in GetBonesDataForFrame", this);
 
-            foreach (KeyValuePair<RigBodyParts, BoneData> boneData in firstFrameBonesData)
+			foreach (var currentBoneData in m_FrameData[firstFrame])
+			{
+				RigBodyParts bodyPartName = currentBoneData.Key;
+				BoneData interpolatedBodyPartData = GetBoneDataForFrameT(
+					firstFrameData[bodyPartName],
+					nextFrameData[bodyPartName],
+					firstFrame,
+					nextFrame
+				);
+
+				interpolatedFrame.Add(bodyPartName, interpolatedBodyPartData);
+			}
+			/*
+			foreach (KeyValuePair<RigBodyParts, BoneData> boneData in firstFrameBonesData)
             {
                 BoneData data = GetBoneDataForFrameT(boneData.Value, secondFrameBonesData[boneData.Key], firstFrameNb, secondFrameNb);
                 bonesDataForFrame.Add(boneData.Key, data);
             }
+			*/
 
-            return bonesDataForFrame;
+			return interpolatedFrame;
         }
         public BoneData GetBoneDataForFrameT(BoneData firstFrameBoneData, BoneData secondFrameBoneData, float firstFrameNb, float secondFrameNb)
         {
@@ -255,9 +317,9 @@ namespace MotionMatching.Animation
 
             float t = firstFrameNb / secondFrameNb;
 
-            boneData.m_Rotation = GetInterpolatedValue(firstFrameBoneData.m_Rotation, secondFrameBoneData.m_Rotation, t);
+            boneData.m_EulerAngles = GetInterpolatedValue(firstFrameBoneData.m_EulerAngles, secondFrameBoneData.m_EulerAngles, t);
             boneData.m_Position = GetInterpolatedValue(firstFrameBoneData.m_Position, secondFrameBoneData.m_Position, t);
-			boneData.m_Scale	= GetInterpolatedValue(firstFrameBoneData.m_Scale, secondFrameBoneData.m_Scale, t);
+			boneData.m_LocalScale	= GetInterpolatedValue(firstFrameBoneData.m_LocalScale, secondFrameBoneData.m_LocalScale, t);
 
 			return boneData;
         }
