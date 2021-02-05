@@ -2,25 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Arrow : MonoBehaviour
+public class HipsProjection : MonoBehaviour
 {
 
     [SerializeField] GameObject Hips, RFeet, LFeet;
     private GameObject Repere, CurrentPlatform, Ground;
 
-    public Vector3 HipsGroundPosition { get; private set; }
-    public Vector3 RFeetHipsPosition { get; private set; }
-    public Vector3 LFeetHipsPosition { get; private set; }
-    // Start is called before the first frame update
+    public bool m_DrawArrow = true;
+
+    private Vector3 _hipsGroundPosition { get; set; }
+    private Vector3 _rFeetHipsPosition { get; set; }
+    private Vector3 _lFeetHipsPosition { get; set; }
+
     void Start()
     {
         Repere = new GameObject();
         Repere.name = "HipsRepere";
     }
 
-    // Update is called once per frame
     void Update()
     {
+        if (!m_DrawArrow)
+            return;
         Vector3 HipsPosition = Hips.transform.position;
         Vector3 HipsDirection = Hips.transform.forward;
 
@@ -32,10 +35,10 @@ public class Arrow : MonoBehaviour
 
         if (Ground != null)
         {
-            HipsGroundPosition = Ground.transform.InverseTransformPoint(Hips.transform.position);
-            Repere.transform.position = HipsGroundPosition;
-            RFeetHipsPosition = Repere.transform.InverseTransformPoint(RFeet.transform.position);
-            LFeetHipsPosition = Repere.transform.InverseTransformPoint(LFeet.transform.position);
+            _hipsGroundPosition = Ground.transform.InverseTransformPoint(Hips.transform.position);
+            Repere.transform.position = _hipsGroundPosition;
+            _rFeetHipsPosition = Repere.transform.InverseTransformPoint(RFeet.transform.position);
+            _lFeetHipsPosition = Repere.transform.InverseTransformPoint(LFeet.transform.position);
         
             drawArrowOnGround(HipsPosition, HipsDirection, Color.red);
             drawArrowOnGround(RFeetPosition, RFeetDirection, Color.blue);
@@ -43,16 +46,16 @@ public class Arrow : MonoBehaviour
         }
     }
 
+    #region draw arrow on ground
     private void OnCollisionEnter(Collision collision)
     {
         if(collision.gameObject.tag == "Platform")
         {
-            Debug.Log("Platform change");
+            // Debug.Log("Platform change");
             CurrentPlatform = collision.gameObject;
             Ground = collision.gameObject.transform.parent.gameObject;
         }
     }
-
     void drawArrowOnGround(Vector3 position,Vector3 direction, Color color)
     {
         direction.y = CurrentPlatform.transform.rotation.y;
@@ -65,7 +68,7 @@ public class Arrow : MonoBehaviour
         Debug.DrawRay(position + direction.normalized/2, left * arrowHeadLength, color);
         Debug.DrawRay(position, direction.normalized/2, color);
     }
-
+    #endregion
 
 
 }

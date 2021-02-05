@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using MotionMatching.Animation;
+using MotionMatching.Matching;
 
 [RequireComponent(typeof(AnimationController))]
 public class Main : RunnableCoroutine
@@ -12,6 +13,7 @@ public class Main : RunnableCoroutine
 	private AnimationController m_AnimationController;
 	public UnityAnimationConverter m_AnimationConverter;
     public LoadedAnimationFile m_AnimationToUse;
+
 	public string filename = "";
 	#endregion
 
@@ -25,9 +27,6 @@ public class Main : RunnableCoroutine
 	{
 		s_OnUpdateEvents += TraceExecTime;
 	}
-
-
-
 
 	[Button]
 	public void LoadAnimationFromFBXFile()
@@ -43,11 +42,11 @@ public class Main : RunnableCoroutine
 	[Button]
 	public void LoadAnimationFromUnity(string animationPath)
     {
-		m_AnimationConverter.Create(animationPath);
-		while (!m_AnimationConverter.CanRetrieveLoadedAnimationFile()) ;
-		m_AnimationToUse = m_AnimationConverter.file;
-
-		Debug.Log("Created LoadedAnimationFile at " + animationPath);
+		// m_AnimationConverter.Create(animationPath);
+		// while (!m_AnimationConverter.CanRetrieveLoadedAnimationFile()) ;
+		// m_AnimationToUse = m_AnimationConverter.file;
+		// 
+		// Debug.Log("Created LoadedAnimationFile at " + animationPath);
 	}
 
 	[Button]

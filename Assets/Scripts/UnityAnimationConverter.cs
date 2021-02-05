@@ -9,7 +9,7 @@ namespace MotionMatching.Animation
     [RequireComponent(typeof(Animator))]
     public class UnityAnimationConverter : MonoBehaviour
     {
-        [ShowInInspector] public BonesMatching m_BonesMatching;
+        [ShowInInspector] public LoadedBonesMatching m_BonesMatching;
         public LoadedAnimationFile file;
         public Animator playerAnimator;
         private AnimatorClipInfo[] animationClip;

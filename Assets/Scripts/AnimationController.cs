@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using MotionMatching.Matching;
 
 namespace MotionMatching.Animation
 {
@@ -42,7 +43,10 @@ namespace MotionMatching.Animation
 		[Header("Animation data")]
 		[ShowInInspector] public Dictionary<RigBodyParts, Transform> m_Bones;
 
-		public BonesMatching bonesMatching;
+		public Transform m_CharacterToAnimate;
+		public bool m_ApplyXZPositionTransformationToCharacter = false;
+		public LoadedBonesMatching bonesMatching;
+		public LoadedMocapFrameData m_LoadedMocapFrameData;
 
 		// frames number start at 1
 		[ShowInInspector, ReadOnly] public SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData; 
@@ -109,6 +113,7 @@ namespace MotionMatching.Animation
 				StopCoroutine(m_AnimationCR);
 				m_AnimationCR = null;
 				m_AnimationCR_isRunning = false;
+				m_CurrentFrame = 0;
 			}
 			catch (UnityException e)
 			{
@@ -162,6 +167,50 @@ namespace MotionMatching.Animation
 			}
 		}
 
+
+
+		// https://forum.unity.com/threads/transform-inversetransformpoint-without-transform.954939/
+		// https://twitter.com/georgerrmartin_/status/410279960624918529?lang=fr
+		Vector3 InverseTransformPoint(Vector3 transforPos, Quaternion transformRotation, Vector3 transformScale, Vector3 pos)
+		{
+			Matrix4x4 matrix = Matrix4x4.TRS(transforPos, transformRotation, transformScale);
+			Matrix4x4 inverse = matrix.inverse;
+			return inverse.MultiplyPoint3x4(pos);
+		}
+
+		[Button]
+		public void InitMocapFrameData()
+		{
+			m_LoadedMocapFrameData.m_FrameData = new SortedDictionary<int, MocapFrameData>();
+			for (int i_frame = 0; i_frame < m_FrameData.Count - 1; ++i_frame)
+			{
+				Vector3 positionHipProjection = m_FrameData[i_frame][RigBodyParts.hip].m_Position;
+				Vector3 positionFuturHipProjection = m_FrameData[i_frame + 1][RigBodyParts.hip].m_Position;
+
+				Vector3 positionRFeet = m_FrameData[i_frame][RigBodyParts.rFoot].m_Position;
+				Vector3 positionLFeet = m_FrameData[i_frame][RigBodyParts.lFoot].m_Position;
+
+				Vector3 rightFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionRFeet),
+						leftFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionLFeet);
+
+				MocapFrameData.FeetPositions positionFeet = new MocapFrameData.FeetPositions
+				{
+					m_PositionRightFoot = rightFeetPositionProjectedInHipSystem,
+					m_PositionLeftFoot = leftFeetPositionProjectedInHipSystem
+				};
+				MocapFrameData frameData = new MocapFrameData(
+					i_frame,
+					positionHipProjection,
+					positionFuturHipProjection,
+					positionFeet
+				);
+				m_LoadedMocapFrameData.m_FrameData.Add(i_frame, frameData);
+			}
+			Debug.Log("Sucessfully initiated motion capture frame data.");
+		}
+
+
+
 		/*
 		 * Accepts only fbx file format
 		 * Constructs the m_FrameData structure and sets the m_LastFrameNumber
@@ -212,15 +261,20 @@ namespace MotionMatching.Animation
 			{
 				var bone = kvpBone.Value;
 				var boneType = kvpBone.Key;
-
 				if (bone != null)
 				{
 					var boneFrameData = currentFrameData[boneType];
 					SetBoneData(bone, boneFrameData);
-				}
-				else
-				{
-					// print("Cant set bonedata of " + boneType.ToString());
+                    // else
+                    // {
+					// 	Vector3 inverseHipMovement = -boneFrameData.m_Position;
+					// 	SetBoneData(
+					// 		bone,
+					// 		boneFrameData.m_Position + inverseHipMovement,
+					// 		boneFrameData.m_EulerAngles,
+					// 		boneFrameData.m_LocalScale
+					// 	);
+					// }
 				}
 			}
 			// foreach (var rigFrameData in currentFrameData)
@@ -242,6 +296,12 @@ namespace MotionMatching.Animation
 			t.position= bd.m_Position;
 			t.eulerAngles = bd.m_EulerAngles;
 			t.localScale = bd.m_LocalScale;
+		}
+		public void SetBoneData(Transform t, Vector3 position, Vector3 eulerAngles, Vector3 scale)
+		{
+			t.position = position;
+			t.eulerAngles = eulerAngles;
+			t.localScale = scale;
 		}
 
 		public Dictionary<RigBodyParts, BoneData> GetBonesDataForFrame(int frameNb)
@@ -328,5 +388,15 @@ namespace MotionMatching.Animation
             return Vector3.Lerp(a, b, t);
         }
 		#endregion
+
+
+		void OnGUI()
+		{
+			if (GUI.Button(new Rect(10, 10, 50, 50), "Run"))
+				Run();
+
+			if (GUI.Button(new Rect(10, 70, 50, 30), "Stop"))
+				Stop();
+		}
 	}
 }
