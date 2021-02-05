@@ -26,6 +26,7 @@ public class Main : RunnableCoroutine
 	private void Start()
 	{
 		s_OnUpdateEvents += TraceExecTime;
+		BindFrameData();
 	}
 
 	[Button]

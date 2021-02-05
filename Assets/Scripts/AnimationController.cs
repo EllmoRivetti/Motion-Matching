@@ -181,6 +181,12 @@ namespace MotionMatching.Animation
 		[Button]
 		public void InitMocapFrameData()
 		{
+			if (m_LoadedMocapFrameData == null)
+            {
+				Debug.LogError("Please set m_LoadedMocapFrameData in AnimationController", this);
+				return;
+            }
+				
 			m_LoadedMocapFrameData.m_FrameData = new SortedDictionary<int, MocapFrameData>();
 			for (int i_frame = 0; i_frame < m_FrameData.Count - 1; ++i_frame)
 			{
@@ -257,6 +263,7 @@ namespace MotionMatching.Animation
 		#region SetOrGetBones
 		public void SetBonesData(Dictionary<RigBodyParts, BoneData> currentFrameData)
 		{
+			Debug.Log("inside SetBonesData");
 			foreach (var kvpBone in m_Bones)
 			{
 				var bone = kvpBone.Value;

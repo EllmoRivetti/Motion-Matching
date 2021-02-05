@@ -46,6 +46,10 @@ public class PathMover : MonoBehaviour
 
     private MocapFrameData GetBestFrame(Vector3 movement)
     {
+        // Debug.Log("----------------------------");
+        // Debug.Log("inside GetBestFrame");
+        // Debug.Log(movement);
+
         float bestScore = -1;
         MocapFrameData bestFrame = null;
         foreach(var kvp in m_AnimationController.m_LoadedMocapFrameData.m_FrameData)
@@ -60,11 +64,14 @@ public class PathMover : MonoBehaviour
                 bestFrame = frame;
             }
         }
+        // Debug.Log(bestScore);
+        // Debug.Log(bestFrame);
         return bestFrame;
     }
 
     private void ApplyAnimationFrame(MocapFrameData frameData)
     {
+        Debug.Log("inside ApplyAnimationFrame");
         m_AnimationController.SetBonesData(m_AnimationController.m_FrameData[frameData.m_FrameNumber]);
     }
 
