@@ -978,6 +978,7 @@ MonoBehaviour:
   bonesMatching: {fileID: 11400000, guid: bd2f3ab05e26d4d438401c3640ce1978, type: 2}
   m_LoadedMocapFrameData: {fileID: 11400000, guid: f47b04a2ef1e16744992388b5a45e6c2, type: 2}
   m_FramesPerSecond: 30
+  m_FutureHipObject: {fileID: 0}
 --- !u!1 &677737722
 GameObject:
   m_ObjectHideFlags: 0
@@ -1642,6 +1643,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseMotionMatching: 1
   m_AnimationController: {fileID: 603287833}
+  m_MotionMatchingFramesIntervalToUse: 10
 --- !u!195 &2079202619
 NavMeshAgent:
   m_ObjectHideFlags: 0

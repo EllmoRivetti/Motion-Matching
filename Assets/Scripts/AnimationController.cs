@@ -94,8 +94,9 @@ namespace MotionMatching.Animation
 
 		#region Event buttons
 		[Button]
-		public void Run()
+		public void Run(int i_frame = 0, int frames_interval = -1)
 		{
+			m_CurrentFrame = i_frame;
 			if (!m_AnimationCR_isRunning)
 			{
 				m_Run = true;
@@ -181,6 +182,16 @@ namespace MotionMatching.Animation
 		[Button]
 		public void InitMocapFrameData()
 		{
+			// noter la TRS_w des hips courante
+			// faire avancer l'anim de 50 frames
+			// noter la TRS_w des hips du futur
+			// changer de repere les hips du futur pour les mettre dans les hips courante
+
+			// hipsFutur_TRS_w[derniere colonne] => posHipFuture_w
+			// inverser(hipCourante_TRS_w) * posHipFuture_w => posHipFutures_hipCourante
+			// garder juste le (X, Z)
+			// normalizer le reste
+
 			if (m_LoadedMocapFrameData == null)
             {
 				Debug.LogError("Please set m_LoadedMocapFrameData in AnimationController", this);
@@ -190,31 +201,35 @@ namespace MotionMatching.Animation
 			m_LoadedMocapFrameData.m_FrameData = new SortedDictionary<int, MocapFrameData>();
 			for (int i_frame = 0; i_frame < m_FrameData.Count - 1; ++i_frame)
 			{
-				Vector3 positionHipProjection = m_FrameData[i_frame][RigBodyParts.hip].m_Position;
-				Vector3 positionFuturHipProjection = m_FrameData[i_frame + 1][RigBodyParts.hip].m_Position;
-
-				Vector3 positionRFeet = m_FrameData[i_frame][RigBodyParts.rFoot].m_Position;
-				Vector3 positionLFeet = m_FrameData[i_frame][RigBodyParts.lFoot].m_Position;
-
-				Vector3 rightFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionRFeet),
-						leftFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionLFeet);
-
-				MocapFrameData.FeetPositions positionFeet = new MocapFrameData.FeetPositions
-				{
-					m_PositionRightFoot = rightFeetPositionProjectedInHipSystem,
-					m_PositionLeftFoot = leftFeetPositionProjectedInHipSystem
-				};
-				MocapFrameData frameData = new MocapFrameData(
-					i_frame,
-					positionHipProjection,
-					positionFuturHipProjection,
-					positionFeet
-				);
+				var frameData = CreateDataFromFrame(i_frame);
 				m_LoadedMocapFrameData.m_FrameData.Add(i_frame, frameData);
 			}
-			Debug.Log("Sucessfully initiated motion capture frame data.");
 		}
 
+		MocapFrameData CreateDataFromFrame(int i_frame)
+        {
+			Vector3 positionHipProjection = m_FrameData[i_frame][RigBodyParts.hip].m_Position;
+			Vector3 positionFuturHipProjection = m_FrameData[i_frame + 1][RigBodyParts.hip].m_Position;
+
+			Vector3 positionRFeet = m_FrameData[i_frame][RigBodyParts.rFoot].m_Position;
+			Vector3 positionLFeet = m_FrameData[i_frame][RigBodyParts.lFoot].m_Position;
+
+			Vector3 rightFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionRFeet),
+					leftFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionLFeet);
+
+			MocapFrameData.FeetPositions positionFeet = new MocapFrameData.FeetPositions
+			{
+				m_PositionRightFoot = rightFeetPositionProjectedInHipSystem,
+				m_PositionLeftFoot = leftFeetPositionProjectedInHipSystem
+			};
+
+			return new MocapFrameData(
+				i_frame,
+				positionHipProjection,
+				positionFuturHipProjection,
+				positionFeet
+			);
+		}
 
 
 		/*
