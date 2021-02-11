@@ -64,8 +64,6 @@ namespace MotionMatching.Animation
 		protected IEnumerator m_AnimationCR;
 		protected bool m_AnimationCR_isRunning = false;
 
-		public GameObject m_FutureHipObject;
-
 		#endregion
 
 		[Button]
@@ -159,10 +157,6 @@ namespace MotionMatching.Animation
 				{
 					var currentFrameData = GetBonesDataForFrame(m_CurrentFrame);
 					SetBonesData(currentFrameData);
-
-					if (m_LoadedMocapFrameData != null && m_LoadedMocapFrameData.m_FrameData[m_CurrentFrame] != null)
-						m_FutureHipObject.transform.position = m_LoadedMocapFrameData.m_FrameData[m_CurrentFrame].m_PositionFuturHipProjection;
-
 					yield return new WaitForSeconds(1.0f / (float)m_FramesPerSecond);
 					m_CurrentFrame++;
 				}
