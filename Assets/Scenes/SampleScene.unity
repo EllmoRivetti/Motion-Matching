@@ -978,6 +978,7 @@ MonoBehaviour:
   bonesMatching: {fileID: 11400000, guid: 1b4f1a1e45de83e4a8bc50a27b54bb9a, type: 2}
   m_LoadedMocapFrameData: {fileID: 11400000, guid: f47b04a2ef1e16744992388b5a45e6c2, type: 2}
   m_FramesPerSecond: 30
+  m_FutureHipObject: {fileID: 0}
 --- !u!1 &677737722
 GameObject:
   m_ObjectHideFlags: 0
@@ -1547,6 +1548,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_UseMotionMatching: 1
   m_AnimationController: {fileID: 603287833}
+  m_MotionMatchingFramesIntervalToUse: 10
 --- !u!195 &2079202619
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -3050,7 +3052,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919132147618597991}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 9000000, guid: bad187a12c831be458464e1326171251, type: 3}
   m_Controller: {fileID: 9100000, guid: db15b3f7536a09d449ea261e69cb84c2, type: 2}
   m_CullingMode: 1

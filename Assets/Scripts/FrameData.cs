@@ -9,8 +9,14 @@ namespace MotionMatching.Matching
         static private int m_FuturTime = 1;
 
         public int m_FrameNumber { get; set; }
+
+        // Repere par rapport au gameobject "Ground"
         public Vector2 m_PositionHipProjection { get; set; }
+
+        // Repere par rapport 
         public Vector2 m_PositionFuturHipProjection { get; set; }
+
+        // TODO add hip rotation
 
         public FeetPositions m_PositionFeet { get; set; }
 

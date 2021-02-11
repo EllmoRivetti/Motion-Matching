@@ -49,7 +49,7 @@ public class HipsProjection : MonoBehaviour
     #region draw arrow on ground
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.tag == "Platform")
+        if(collision.gameObject.tag == "Ground")
         {
             // Debug.Log("Platform change");
             CurrentPlatform = collision.gameObject;

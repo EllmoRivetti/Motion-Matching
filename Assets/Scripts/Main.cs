@@ -56,6 +56,12 @@ public class Main : RunnableCoroutine
 		m_AnimationController.BindAnimationData(m_AnimationToUse.m_FrameData);
 		// m_AnimationController.FixDefaultPosition();
 		print("Successfully binded animation data to controller");
+
+		m_AnimationController.CopyBonesMatching();
+		print("Successfully copied bones matching from controller");
+
+		m_AnimationController.InitMocapFrameData();
+		print("Successfully initiated motion capture frame data");
 	}
 
 	private float m_tmp_timeSinceStart = 0.0f;
