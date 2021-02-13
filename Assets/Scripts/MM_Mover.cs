@@ -16,30 +16,49 @@ namespace MotionMatching.Animation
         public Transform m_Destination;
         public AnimationController m_AnimationController;
         [Range(0, 50)] public int m_MotionMatchingFramesIntervalToUse = 10;
-        [ShowInInspector] private int m_MMIntervalFramesRemaining = 0;
+        private bool m_MMAnimationFinished = true;
+        public Transform m_HipsTransform;
+
+
 
         private bool m_CalculatingMotionMatchingFrame = false;
         
         void Update()
         {
-            if (!m_CalculatingMotionMatchingFrame && m_MMIntervalFramesRemaining == 0)
+            // RunMotionMatchingOnce(verbose: false);
+        }
+
+        [Button]
+        public void RunMotionMatchingOnce(bool verbose = true)
+        {
+            if (!m_CalculatingMotionMatchingFrame && m_MMAnimationFinished == true)
             {
                 m_CalculatingMotionMatchingFrame = true;
                 StartCoroutine(MoveUsingMotionMatching());
                 m_CalculatingMotionMatchingFrame = false;
             }
+            else 
+            {
+                if (verbose)
+                    Debug.Log("MotionMatching Already running");
+            }
+        }
+
+
+        private Vector3 GetCharacterMovement()
+        {
+            Vector3 movementDestination = m_Destination.position;
+            Vector3 currentCharacterPosition = m_HipsTransform.position;
+            return movementDestination - currentCharacterPosition;
         }
 
         private IEnumerator MoveUsingMotionMatching()
         {
-            print("inside MoveUsingMotionMatching");
-            m_MMIntervalFramesRemaining = m_MotionMatchingFramesIntervalToUse;
+            m_MMAnimationFinished = false;
+            Vector3 characterMovement = GetCharacterMovement();
 
-            Vector3 movementDestination = m_Destination.position;
-            Vector3 characterMovement = movementDestination - transform.position;
-
-            var frame = GetBestFrame(characterMovement);
-            ApplyAnimationFrame(frame);
+            var bestFrame = GetBestFrame(characterMovement);
+            ApplyAnimationFrame(bestFrame);
 
             yield return null;
         }
@@ -71,11 +90,11 @@ namespace MotionMatching.Animation
 
         private void ApplyAnimationFrame(MocapFrameData frameData)
         {
-            Debug.Log("ApplyAnimationFrame (from:" + frameData.m_FrameNumber + "; interval: " + m_MMIntervalFramesRemaining + ")");
+            Debug.Log("ApplyAnimationFrame (from:" + frameData.m_FrameNumber + "; interval: " + m_MMAnimationFinished + ")");
             m_AnimationController.RunNFramesFromFrame(
-                m_MMIntervalFramesRemaining, 
+                m_MotionMatchingFramesIntervalToUse, 
                 frameData.m_FrameNumber, 
-                () => m_MMIntervalFramesRemaining = 0
+                () => m_MMAnimationFinished = true
             );
         }
     }
