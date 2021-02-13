@@ -7,37 +7,8 @@ using MotionMatching.Matching;
 
 namespace MotionMatching.Animation
 {
-	//public enum RigBodyParts
-	//{
-	//	HIPS, SPINE, CHEST, UPPER_CHEST,
-	//	LEFT_ARM_SHOULDER, LEFT_ARM_UPPER, LEFT_ARM_LOWER, LEFT_ARM_HAND,
-	//	RIGHT_ARM_SHOULDER, RIGHT_ARM_UPPER, RIGHT_ARM_LOWER, RIGHT_ARM_HAND,
-	//	LEFT_LEG_UPPER, LEFT_LEG_LOWER, LEFT_LEG_FOOT, LEFT_LEG_TOES,
-	//	RIGHT_LEG_UPPER, RIGHT_LEG_LOWER, RIGHT_LEG_FOOT, RIGHT_LEG_TOES,
 
-	//	HEAD_NECK, HEAD_HEAD, HEAD_LEFT_EYE, HEAD_RIGHT_EYE, HEAD_JAW,
-
-	//	LEFT_HAND_THUMB_PROXIMAL, LEFT_HAND_THUMB_INTERMEDIATE, LEFT_HAND_THUMB_DISTAL,
-	//	LEFT_HAND_INDEX_PROXIMAL, LEFT_HAND_INDEX_INTERMEDIATE, LEFT_HAND_INDEX_DISTAL,
-	//	LEFT_HAND_MIDDLE_PROXIMAL, LEFT_HAND_MIDDLE_INTERMEDIATE, LEFT_HAND_MIDDLE_DISTAL,
-	//	LEFT_HAND_RING_PROXIMAL, LEFT_HAND_RING_INTERMEDIATE, LEFT_HAND_RING_DISTAL,
-	//	LEFT_HAND_LITTLE_PROXIMAL, LEFT_HAND_LITTLE_INTERMEDIATE, LEFT_HAND_LITTLE_DISTAL,
-
-	//	RIGHT_HAND_THUMB_PROXIMAL, RIGHT_HAND_THUMB_INTERMEDIATE, RIGHT_HAND_THUMB_DISTAL,
-	//	RIGHT_HAND_INDEX_PROXIMAL, RIGHT_HAND_INDEX_INTERMEDIATE, RIGHT_HAND_INDEX_DISTAL,
-	//	RIGHT_HAND_MIDDLE_PROXIMAL, RIGHT_HAND_MIDDLE_INTERMEDIATE, RIGHT_HAND_MIDDLE_DISTAL,
-	//	RIGHT_HAND_RING_PROXIMAL, RIGHT_HAND_RING_INTERMEDIATE, RIGHT_HAND_RING_DISTAL,
-	//	RIGHT_HAND_LITTLE_PROXIMAL, RIGHT_HAND_LITTLE_INTERMEDIATE, RIGHT_HAND_LITTLE_DISTAL
-	//}
-	[Serializable]
-	public struct BoneData
-	{
-		public Vector3 m_Position;
-		public Vector3 m_EulerAngles;
-		public Vector3 m_LocalScale;
-	}
-
-	public class AnimationController : SerializedMonoBehaviour
+    public class AnimationController : SerializedMonoBehaviour
 	{
 		#region Members
 		[Header("Animation data")]
@@ -64,6 +35,9 @@ namespace MotionMatching.Animation
 		protected IEnumerator m_AnimationCR;
 		protected bool m_AnimationCR_isRunning = false;
 
+		public int m_FramesToRun = -1; // If set to -1, this paramter is discarded
+		private event Action onAnimationEnd;
+
 		#endregion
 
 		[Button]
@@ -71,7 +45,7 @@ namespace MotionMatching.Animation
         {
 			bonesMatching.m_Bones = m_Bones;
 		}
-
+		
 		private void OnValidate()
 		{
 			//  Bind bones
@@ -83,20 +57,20 @@ namespace MotionMatching.Animation
 					m_Bones[value] = null;
 				}
 			}
-			// Swap frame
-			if (Application.isPlaying)
-            {
-				var frameData = GetBonesDataForFrame(m_CurrentFrame);
-				if (frameData != null)
-					SetBonesData(frameData);
-            }
+
+			// // Swap frame
+			// if (Application.isPlaying)
+            // {
+			// 	var frameData = GetBonesDataForFrame(m_CurrentFrame);
+			// 	if (frameData != null)
+			// 		SetBonesData(frameData);
+            // }
 		}
 
 		#region Event buttons
 		[Button]
-		public void Run(int i_frame = 0, int frames_interval = -1)
+		public void Run()
 		{
-			m_CurrentFrame = i_frame;
 			if (!m_AnimationCR_isRunning)
 			{
 				m_Run = true;
@@ -105,6 +79,24 @@ namespace MotionMatching.Animation
 				m_AnimationCR_isRunning = true;
 			}
 		}
+
+		[Button]
+		public void RunFromFrame(int i_frame)
+        {
+			print("RunFromFrame(" + i_frame + ")");
+			m_CurrentFrame = i_frame;
+			Run();
+		}
+		[Button]
+		public void RunNFramesFromFrame(int n, int i_frame, Action onFinishedAnimationSequence = null)
+		{
+			print("RunNFramesFromFrame(" + n + ", " + i_frame + ", " + onFinishedAnimationSequence == null + ")");
+			m_FramesToRun = n;
+			RunFromFrame(i_frame);
+			onAnimationEnd += onFinishedAnimationSequence;
+			onAnimationEnd += () => m_FramesToRun = -1;
+		}
+		
 		[Button]
 		public void Stop()
 		{
@@ -146,19 +138,57 @@ namespace MotionMatching.Animation
 			bones.ForEach(x => m_Bones.Remove(x));
 		}
 
+
+		private void DesactivateAllCharacterAnimators(Animator[] characterAnimators, bool[] activeCharacterAnimators)
+        {
+			for (int i_animator = 0; i_animator < characterAnimators.Length; i_animator++)
+			{
+				activeCharacterAnimators[i_animator] = characterAnimators[i_animator].enabled;
+				characterAnimators[i_animator].enabled = false;
+			}
+		}
+		private void ResetAllCharacterAnimators(Animator[] characterAnimators, bool[] activeCharacterAnimators)
+        {
+			for (int i_animator = 0; i_animator < characterAnimators.Length; i_animator++)
+			{
+				characterAnimators[i_animator].enabled = activeCharacterAnimators[i_animator];
+			}
+		}
+
+
 		private IEnumerator RunAnimation()
 		{
 			if (!Application.isPlaying) yield return null;
+			// Animator[] characterAnimators = m_CharacterToAnimate.GetComponentsInChildren<Animator>();
+			// bool[] activeCharacterAnimators = new bool[characterAnimators.Length];
 
+			// DesactivateAllCharacterAnimators(characterAnimators, activeCharacterAnimators);
+
+
+			print("Running animation");
 			// RemoveNullBonesFromMBones();
-			while (m_Run && !m_Pause && m_CurrentFrame <= m_FrameData.Count)
+			while (
+				m_Run && 
+				!m_Pause && 
+				m_CurrentFrame <= m_FrameData.Count && 
+				(m_FramesToRun == -1 || m_FramesToRun > 0) // parameter m_FramesToRun is not set OR parameter m_FramesToRun is set
+			)
 			{
 				if (!m_Pause)
 				{
+					// Apply current frame data to the rig
 					var currentFrameData = GetBonesDataForFrame(m_CurrentFrame);
 					SetBonesData(currentFrameData);
+
+					// print("m_CurrentFrame: " + m_CurrentFrame);
+
+					// Wait next frame
 					yield return new WaitForSeconds(1.0f / (float)m_FramesPerSecond);
+					
+					// Change current frame indexes
 					m_CurrentFrame++;
+					if (m_FramesToRun != -1)
+						m_FramesToRun--;
 				}
 				else
 				{
@@ -166,19 +196,29 @@ namespace MotionMatching.Animation
 				}
 
 			}
+			m_AnimationCR_isRunning = false;
+			print("Finished animation");
+
+			// ResetAllCharacterAnimators(characterAnimators, activeCharacterAnimators);
+
+			// Run onAnimationEnd event and clear it from all subscribers
+			if (onAnimationEnd != null)
+            {
+				onAnimationEnd();
+				onAnimationEnd = null;
+            }
 		}
 
 
-
-		// https://forum.unity.com/threads/transform-inversetransformpoint-without-transform.954939/
-		// https://twitter.com/georgerrmartin_/status/410279960624918529?lang=fr
-		Vector3 InverseTransformPoint(Vector3 transforPos, Quaternion transformRotation, Vector3 transformScale, Vector3 pos)
+        #region FrameDataCreation
+        // https://forum.unity.com/threads/transform-inversetransformpoint-without-transform.954939/
+        // https://twitter.com/georgerrmartin_/status/410279960624918529?lang=fr
+        Vector3 InverseTransformPoint(Vector3 transforPos, Quaternion transformRotation, Vector3 transformScale, Vector3 pos)
 		{
 			Matrix4x4 matrix = Matrix4x4.TRS(transforPos, transformRotation, transformScale);
 			Matrix4x4 inverse = matrix.inverse;
 			return inverse.MultiplyPoint3x4(pos);
 		}
-
 		[Button]
 		public void InitMocapFrameData()
 		{
@@ -205,14 +245,13 @@ namespace MotionMatching.Animation
 				m_LoadedMocapFrameData.m_FrameData.Add(i_frame, frameData);
 			}
 		}
-
 		MocapFrameData CreateDataFromFrame(int i_frame)
         {
-			Vector3 positionHipProjection = m_FrameData[i_frame][RigBodyParts.hip].m_Position;
-			Vector3 positionFuturHipProjection = m_FrameData[i_frame + 1][RigBodyParts.hip].m_Position;
+			Vector3 positionHipProjection = m_FrameData[i_frame][RigBodyParts.hip].m_Position_ws;
+			Vector3 positionFuturHipProjection = m_FrameData[i_frame + 1][RigBodyParts.hip].m_Position_ws;
 
-			Vector3 positionRFeet = m_FrameData[i_frame][RigBodyParts.rFoot].m_Position;
-			Vector3 positionLFeet = m_FrameData[i_frame][RigBodyParts.lFoot].m_Position;
+			Vector3 positionRFeet = m_FrameData[i_frame][RigBodyParts.rFoot].m_Position_ws;
+			Vector3 positionLFeet = m_FrameData[i_frame][RigBodyParts.lFoot].m_Position_ws;
 
 			Vector3 rightFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionRFeet),
 					leftFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionLFeet);
@@ -230,6 +269,8 @@ namespace MotionMatching.Animation
 				positionFeet
 			);
 		}
+		#endregion
+
 
 
 		/*
@@ -264,7 +305,7 @@ namespace MotionMatching.Animation
 						BoneData currentBoneObject = currentFrame[currentBoneName];
 						BoneData firstFrameBoneObject = firstFrame[currentBoneName];
 
-						currentBoneObject.m_Position = (currentBoneObject.m_Position - firstFrameBoneObject.m_Position) * .1f;
+						currentBoneObject.m_Position_ws = (currentBoneObject.m_Position_ws - firstFrameBoneObject.m_Position_ws) * .1f;
 						m_FrameData[i][currentBoneName] = currentBoneObject;
 						// currentBoneObject.m_Rotation -= firstFrameBoneObject.m_Rotation;
 						// currentBoneObject.m_Scale -= firstFrameBoneObject.m_Scale;
@@ -278,7 +319,7 @@ namespace MotionMatching.Animation
 		#region SetOrGetBones
 		public void SetBonesData(Dictionary<RigBodyParts, BoneData> currentFrameData)
 		{
-			Debug.Log("inside SetBonesData");
+			// Debug.Log("inside SetBonesData");
 			foreach (var kvpBone in m_Bones)
 			{
 				var bone = kvpBone.Value;
@@ -315,8 +356,8 @@ namespace MotionMatching.Animation
 		}
 		public void SetBoneData(Transform t, BoneData bd)
 		{
-			t.position= bd.m_Position;
-			t.eulerAngles = bd.m_EulerAngles;
+			t.position= bd.m_Position_ws;
+			t.eulerAngles = bd.m_EulerAngles_d;
 			t.localScale = bd.m_LocalScale;
 		}
 		public void SetBoneData(Transform t, Vector3 position, Vector3 eulerAngles, Vector3 scale)
@@ -399,8 +440,8 @@ namespace MotionMatching.Animation
 
             float t = firstFrameNb / secondFrameNb;
 
-            boneData.m_EulerAngles = GetInterpolatedValue(firstFrameBoneData.m_EulerAngles, secondFrameBoneData.m_EulerAngles, t);
-            boneData.m_Position = GetInterpolatedValue(firstFrameBoneData.m_Position, secondFrameBoneData.m_Position, t);
+            boneData.m_EulerAngles_d = GetInterpolatedValue(firstFrameBoneData.m_EulerAngles_d, secondFrameBoneData.m_EulerAngles_d, t);
+            boneData.m_Position_ws = GetInterpolatedValue(firstFrameBoneData.m_Position_ws, secondFrameBoneData.m_Position_ws, t);
 			boneData.m_LocalScale	= GetInterpolatedValue(firstFrameBoneData.m_LocalScale, secondFrameBoneData.m_LocalScale, t);
 
 			return boneData;
@@ -410,15 +451,5 @@ namespace MotionMatching.Animation
             return Vector3.Lerp(a, b, t);
         }
 		#endregion
-
-
-		void OnGUI()
-		{
-			if (GUI.Button(new Rect(10, 10, 50, 50), "Run"))
-				Run();
-
-			if (GUI.Button(new Rect(10, 70, 50, 30), "Stop"))
-				Stop();
-		}
 	}
 }

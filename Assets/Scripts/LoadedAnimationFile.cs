@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using Sirenix.OdinInspector;
 
 namespace MotionMatching.Animation

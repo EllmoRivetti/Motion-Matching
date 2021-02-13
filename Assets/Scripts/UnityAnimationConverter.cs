@@ -71,6 +71,8 @@ namespace MotionMatching.Animation
         [Button]
         public void LoadAnimationFromUnityAnimator()
         {
+            
+            playerAnimator.Play(animationClip[0].clip.name, -1, 0f);
             file.m_FrameData = new SortedDictionary<int, Dictionary<RigBodyParts, BoneData>>();
             playerAnimator.speed = m_AnimationSpeed * m_AnimationSpeedMultiplicator;
 
@@ -111,14 +113,16 @@ namespace MotionMatching.Animation
                 {
                     BoneData singleBoneData = new BoneData
                     {
-                        m_Position    = boneTransform.position,
-                        m_EulerAngles = boneTransform.eulerAngles,
+                        m_Position_ws    = boneTransform.position,
+                        m_EulerAngles_d = boneTransform.eulerAngles,
                         m_LocalScale  = boneTransform.localScale
                     };
 
                     currentFrameBoneData.Add(boneName, singleBoneData);
                 }
             }
+            if (file.m_FrameData.ContainsKey(frame))
+                file.m_FrameData.Remove(frame);
             file.m_FrameData.Add(frame, currentFrameBoneData);
             // Resume animation
             playerAnimator.speed = m_AnimationSpeed;
