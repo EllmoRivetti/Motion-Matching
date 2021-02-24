@@ -11,10 +11,15 @@ namespace MotionMatching.Matching
         public int m_FrameNumber { get; set; }
 
         // Repere par rapport au gameobject "Ground"
-        public Vector2 m_PositionHipProjection { get; set; }
+        public Vector3 m_PositionHipProjection { get; set; }
+        public Vector3 m_HipProjectionForward { get; set; }
 
         // Repere par rapport 
-        public Vector2 m_PositionFuturHipProjection { get; set; }
+        public Vector3 m_PositionFuturHipProjection { get; set; }
+
+
+        public Vector3 m_RotationHipProjection { get; set; }
+        public Quaternion m_RotationHipProjection_q { get; set; }
 
         // TODO add hip rotation
 
@@ -38,12 +43,22 @@ namespace MotionMatching.Matching
             }
         }
 
-        public MocapFrameData(int frameTime, Vector2 positionHipProjection, Vector2 positionFuturHipProjection, FeetPositions positionFeet)
+        public MocapFrameData(
+            int frameTime, 
+            Vector3 positionHipProjection, 
+            Vector3 positionFuturHipProjection, 
+            FeetPositions positionFeet,
+            Vector3 rotationHipProjection,
+            Quaternion rotationHipProjection_q,
+            Vector3 hipProjectionForward)
         {
             this.m_FrameNumber = frameTime;
             this.m_PositionHipProjection = positionHipProjection;
             this.m_PositionFuturHipProjection = positionFuturHipProjection;
             this.m_PositionFeet = positionFeet;
+            this.m_RotationHipProjection = rotationHipProjection;
+            this.m_RotationHipProjection_q = rotationHipProjection_q;
+            this.m_HipProjectionForward = hipProjectionForward;
         }
 
         public float GetFrameScore(Vector2 hipTarget)

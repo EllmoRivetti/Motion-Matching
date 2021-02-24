@@ -111,11 +111,30 @@ namespace MotionMatching.Animation
 
                 if (boneTransform != null)
                 {
+                    Vector3 position_ls, eulerAngles_d, localScale;
+                    Quaternion rotation;
+
+                    if (boneName == RigBodyParts.hip)
+                    {
+                        position_ls = boneTransform.position;
+                        rotation = boneTransform.rotation;
+                    }
+                    else
+                    {
+                        position_ls = boneTransform.localPosition;
+                        rotation = boneTransform.localRotation;
+                    }
+
+                    eulerAngles_d = boneTransform.eulerAngles;
+                    localScale = boneTransform.localScale;
+
                     BoneData singleBoneData = new BoneData
                     {
-                        m_Position_ws    = boneTransform.position,
-                        m_EulerAngles_d = boneTransform.eulerAngles,
-                        m_LocalScale  = boneTransform.localScale
+                        m_Position_ls    = position_ls,
+                        m_EulerAngles_ls_d = eulerAngles_d,
+                        m_LocalScale  = localScale,
+                        m_Rotation = rotation,
+                        m_Forward = boneTransform.forward
                     };
 
                     currentFrameBoneData.Add(boneName, singleBoneData);

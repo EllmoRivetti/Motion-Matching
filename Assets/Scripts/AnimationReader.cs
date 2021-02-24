@@ -217,17 +217,17 @@ public static class AnimationReader
     static BoneData SetData(BoneData currentData, string trs, string xyz, float value)
     {
         if (trs == "T" && xyz == "X")
-            currentData.m_Position_ws.x = value;
+            currentData.m_Position_ls.x = value;
         if (trs == "T" && xyz == "Y")
-            currentData.m_Position_ws.y = value;
+            currentData.m_Position_ls.y = value;
         if (trs == "T" && xyz == "Z")
-            currentData.m_Position_ws.z = value;
+            currentData.m_Position_ls.z = value;
         if (trs == "R" && xyz == "X")
-            currentData.m_EulerAngles_d.x = value;
+            currentData.m_EulerAngles_ls_d.x = value;
         if (trs == "R" && xyz == "Y")
-            currentData.m_EulerAngles_d.y = value;
+            currentData.m_EulerAngles_ls_d.y = value;
         if (trs == "R" && xyz == "Z")
-            currentData.m_EulerAngles_d.z = value;
+            currentData.m_EulerAngles_ls_d.z = value;
         if (trs == "S" && xyz == "X")
             currentData.m_LocalScale.x = value;
         if (trs == "S" && xyz == "Y")
@@ -246,17 +246,17 @@ public static class AnimationReader
             {
                 //Debug.Log($"In set data : {pair.Key} {trs} {xyz} / " + pair.Value.m_Position + " - " + pair.Value.m_Rotation + " - " + pair.Value.m_Scale);
                 if (trs == "T" && xyz == "X")
-                    return pair.Value.m_Position_ws.x;
+                    return pair.Value.m_Position_ls.x;
                 if (trs == "T" && xyz == "Y")
-                    return pair.Value.m_Position_ws.y;
+                    return pair.Value.m_Position_ls.y;
                 if (trs == "T" && xyz == "Z")
-                    return pair.Value.m_Position_ws.z;
+                    return pair.Value.m_Position_ls.z;
                 if (trs == "R" && xyz == "X")
-                    return pair.Value.m_EulerAngles_d.x;
+                    return pair.Value.m_EulerAngles_ls_d.x;
                 if (trs == "R" && xyz == "Y")
-                    return pair.Value.m_EulerAngles_d.y;
+                    return pair.Value.m_EulerAngles_ls_d.y;
                 if (trs == "R" && xyz == "Z")
-                    return pair.Value.m_EulerAngles_d.z;
+                    return pair.Value.m_EulerAngles_ls_d.z;
                 if (trs == "S" && xyz == "X")
                     return pair.Value.m_LocalScale.x;
                 if (trs == "S" && xyz == "Y")

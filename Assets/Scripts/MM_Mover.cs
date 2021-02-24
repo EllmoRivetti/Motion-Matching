@@ -19,13 +19,23 @@ namespace MotionMatching.Animation
         private bool m_MMAnimationFinished = true;
         public Transform m_HipsTransform;
 
+        public bool m_ApplyRotation = true;
+        public bool m_ApplyTranslation = true;
+        public bool m_ApplyMMInUpdate = false;
+        public float m_DeltaTime = 1.0f;
 
 
         private bool m_CalculatingMotionMatchingFrame = false;
-        
+
+        private void OnValidate()
+        {
+            Time.timeScale = m_DeltaTime;
+        }
         void Update()
         {
-            // RunMotionMatchingOnce(verbose: false);
+            print(transform.rotation);
+            if (m_ApplyMMInUpdate)
+                RunMotionMatchingOnce(verbose: false);
         }
 
         [Button]
@@ -88,14 +98,81 @@ namespace MotionMatching.Animation
             return bestFrame;
         }
 
+        [Button]
+        public void RunFromFrame(int frame)
+        {
+            ApplyAnimationFrame(m_AnimationController.m_LoadedMocapFrameData.m_FrameData[frame]);
+        }
+
+        // https://forum.unity.com/threads/transform-inversetransformpoint-without-transform.954939/
+        // https://twitter.com/georgerrmartin_/status/410279960624918529?lang=fr
+        Vector3 InverseTransformPoint(Vector3 transforPos, Vector3 pos, Quaternion transformRotation, Vector3 transformScale)
+        {
+            Matrix4x4 matrix = Matrix4x4.TRS(transforPos, transformRotation, transformScale);
+            Matrix4x4 inverse = matrix.inverse;
+            return inverse.MultiplyPoint3x4(pos);
+        }
+
+
         private void ApplyAnimationFrame(MocapFrameData frameData)
         {
             Debug.Log("ApplyAnimationFrame (from:" + frameData.m_FrameNumber + "; interval: " + m_MMAnimationFinished + ")");
+
+            // transform -> character
+            // m_HipsTransform -> courant
+            // frameData -> nouvelle
+
+
+            // // Fix rotation
+            // transform.Rotate(Vector3.up * m_RotationFoundInMM);
+            // 
+            // // Fix position
+            // Vector3 translation = frameData.m_PositionHipProjection - m_HipsTransform.localPosition;
+            // transform.localPosition += translation;
+
+            // float angle = Quaternion.Angle(m_HipsTransform.rotation, frameData.m_RotationHipProjection_q);
+            // transform.Rotate(transform.up, angle);
+            // transform.rotation = angle;
+
+            // Quaternion diff = m_HipsTransform.rotation * Quaternion.Inverse(frameData.m_RotationHipProjection_q);
+            // transform.rotation = diff * transform.rotation;
+
+            if (m_ApplyTranslation)
+            {
+
+                Vector3 translationCharacter = new Vector3(
+                    frameData.m_PositionHipProjection.x - m_HipsTransform.position.x,
+                    0.0f,
+                    frameData.m_PositionHipProjection.z - m_HipsTransform.position.z
+                );
+                // 
+                // // Vector3 rotationCharacter = m_HipsTransform.eulerAngles - frameData.m_RotationHipProjection_ls_euler;
+                // 
+                transform.position += translationCharacter;
+            }
+            if (m_ApplyRotation)
+            {
+
+                Vector3 armPosition = m_HipsTransform.position;
+                Vector3 handPosition = armPosition + m_HipsTransform.forward;
+                Vector3 boxPosition = frameData.m_PositionHipProjection + frameData.m_HipProjectionForward;
+
+                Vector3 currentOffset = m_HipsTransform.InverseTransformPoint(handPosition);
+                Vector3 desiredOffset = InverseTransformPoint(armPosition, boxPosition, Quaternion.identity, Vector3.one);
+
+                // float angle = Quaternion.Angle(m_HipsTransform.rotation, frameData.m_RotationHipProjection_q);
+                // transform.RotateAround(transform.position, transform.up, angle);
+                // transform.Rotate(transform.up, angle);
+                m_HipsTransform.transform.localRotation = Quaternion.FromToRotation(currentOffset, desiredOffset);
+            }
+
+
             m_AnimationController.RunNFramesFromFrame(
                 m_MotionMatchingFramesIntervalToUse, 
                 frameData.m_FrameNumber, 
                 () => m_MMAnimationFinished = true
             );
+
         }
     }
 }   

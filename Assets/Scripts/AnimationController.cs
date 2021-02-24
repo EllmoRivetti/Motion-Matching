@@ -247,11 +247,11 @@ namespace MotionMatching.Animation
 		}
 		MocapFrameData CreateDataFromFrame(int i_frame)
         {
-			Vector3 positionHipProjection = m_FrameData[i_frame][RigBodyParts.hip].m_Position_ws;
-			Vector3 positionFuturHipProjection = m_FrameData[i_frame + 1][RigBodyParts.hip].m_Position_ws;
+			Vector3 positionHipProjection = m_FrameData[i_frame][RigBodyParts.hip].m_Position_ls;
+			Vector3 positionFuturHipProjection = m_FrameData[i_frame + 1][RigBodyParts.hip].m_Position_ls;
 
-			Vector3 positionRFeet = m_FrameData[i_frame][RigBodyParts.rFoot].m_Position_ws;
-			Vector3 positionLFeet = m_FrameData[i_frame][RigBodyParts.lFoot].m_Position_ws;
+			Vector3 positionRFeet = m_FrameData[i_frame][RigBodyParts.rFoot].m_Position_ls;
+			Vector3 positionLFeet = m_FrameData[i_frame][RigBodyParts.lFoot].m_Position_ls;
 
 			Vector3 rightFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionRFeet),
 					leftFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionLFeet);
@@ -264,9 +264,12 @@ namespace MotionMatching.Animation
 
 			return new MocapFrameData(
 				i_frame,
-				positionHipProjection,
-				positionFuturHipProjection,
-				positionFeet
+				positionHipProjection, // new Vector2(positionHipProjection.x, positionHipProjection.z),
+				positionFuturHipProjection, // new Vector2(positionFuturHipProjection.x, positionFuturHipProjection.z),
+				positionFeet,
+				m_FrameData[i_frame][RigBodyParts.hip].m_EulerAngles_ls_d,
+				m_FrameData[i_frame][RigBodyParts.hip].m_Rotation,
+				m_FrameData[i_frame][RigBodyParts.hip].m_Forward
 			);
 		}
 		#endregion
@@ -305,7 +308,7 @@ namespace MotionMatching.Animation
 						BoneData currentBoneObject = currentFrame[currentBoneName];
 						BoneData firstFrameBoneObject = firstFrame[currentBoneName];
 
-						currentBoneObject.m_Position_ws = (currentBoneObject.m_Position_ws - firstFrameBoneObject.m_Position_ws) * .1f;
+						currentBoneObject.m_Position_ls = (currentBoneObject.m_Position_ls - firstFrameBoneObject.m_Position_ls) * .1f;
 						m_FrameData[i][currentBoneName] = currentBoneObject;
 						// currentBoneObject.m_Rotation -= firstFrameBoneObject.m_Rotation;
 						// currentBoneObject.m_Scale -= firstFrameBoneObject.m_Scale;
@@ -319,7 +322,6 @@ namespace MotionMatching.Animation
 		#region SetOrGetBones
 		public void SetBonesData(Dictionary<RigBodyParts, BoneData> currentFrameData)
 		{
-			// Debug.Log("inside SetBonesData");
 			foreach (var kvpBone in m_Bones)
 			{
 				var bone = kvpBone.Value;
@@ -328,36 +330,13 @@ namespace MotionMatching.Animation
 				{
 					var boneFrameData = currentFrameData[boneType];
 					SetBoneData(bone, boneFrameData);
-                    // else
-                    // {
-					// 	Vector3 inverseHipMovement = -boneFrameData.m_Position;
-					// 	SetBoneData(
-					// 		bone,
-					// 		boneFrameData.m_Position + inverseHipMovement,
-					// 		boneFrameData.m_EulerAngles,
-					// 		boneFrameData.m_LocalScale
-					// 	);
-					// }
 				}
 			}
-			// foreach (var rigFrameData in currentFrameData)
-			// {
-			// 	var bone = m_Bones[rigFrameData.Key];
-			// 	var boneFrameData = rigFrameData.Value;
-			// 	if (bone == null)
-            //     {
-			// 		print("Cant set bonedata of " + rigFrameData.Key.ToString());
-            //     }
-            //     else
-			// 	{
-			// 		SetBoneData(bone, boneFrameData);
-			// 	}
-			// }
 		}
 		public void SetBoneData(Transform t, BoneData bd)
 		{
-			t.position= bd.m_Position_ws;
-			t.eulerAngles = bd.m_EulerAngles_d;
+			t.localPosition = bd.m_Position_ls;
+			t.localRotation = bd.m_Rotation;
 			t.localScale = bd.m_LocalScale;
 		}
 		public void SetBoneData(Transform t, Vector3 position, Vector3 eulerAngles, Vector3 scale)
@@ -440,8 +419,8 @@ namespace MotionMatching.Animation
 
             float t = firstFrameNb / secondFrameNb;
 
-            boneData.m_EulerAngles_d = GetInterpolatedValue(firstFrameBoneData.m_EulerAngles_d, secondFrameBoneData.m_EulerAngles_d, t);
-            boneData.m_Position_ws = GetInterpolatedValue(firstFrameBoneData.m_Position_ws, secondFrameBoneData.m_Position_ws, t);
+            boneData.m_EulerAngles_ls_d = GetInterpolatedValue(firstFrameBoneData.m_EulerAngles_ls_d, secondFrameBoneData.m_EulerAngles_ls_d, t);
+            boneData.m_Position_ls = GetInterpolatedValue(firstFrameBoneData.m_Position_ls, secondFrameBoneData.m_Position_ls, t);
 			boneData.m_LocalScale	= GetInterpolatedValue(firstFrameBoneData.m_LocalScale, secondFrameBoneData.m_LocalScale, t);
 
 			return boneData;

@@ -67,12 +67,13 @@ public class HipsProjection : MonoBehaviour
         direction.y = m_CurrentPlatform.transform.rotation.y;
         position.y = m_CurrentPlatform.transform.position.y + 0.1f;
         float arrowHeadLength = 0.25f, arrowHeadAngle = 20.0f;
+        float arrowLength = 1.5f;
         
         Vector3 right = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 180 + arrowHeadAngle, 0) * new Vector3(0, 0, 1);
         Vector3 left = Quaternion.LookRotation(direction) * Quaternion.Euler(0, 180 - arrowHeadAngle, 0) * new Vector3(0, 0, 1);
-        Debug.DrawRay(position + direction.normalized/2, right * arrowHeadLength, color);
-        Debug.DrawRay(position + direction.normalized/2, left * arrowHeadLength, color);
-        Debug.DrawRay(position, direction.normalized/2, color);
+        Debug.DrawRay(position + direction.normalized * arrowLength, right * arrowHeadLength, color);
+        Debug.DrawRay(position + direction.normalized * arrowLength, left * arrowHeadLength, color);
+        Debug.DrawRay(position, direction.normalized * arrowLength, color);
     }
     #endregion
 
