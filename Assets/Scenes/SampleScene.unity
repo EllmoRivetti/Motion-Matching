@@ -946,7 +946,7 @@ MonoBehaviour:
   bonesMatching: {fileID: 11400000, guid: 8da94fccd5decea45944557d01e32d56, type: 2}
   m_LoadedMocapFrameData: {fileID: 11400000, guid: f47b04a2ef1e16744992388b5a45e6c2, type: 2}
   m_FramesPerSecond: 30
-  m_FramesToRun: 10
+  m_FramesToRun: -1
 --- !u!1 &677737722
 GameObject:
   m_ObjectHideFlags: 0
@@ -1343,7 +1343,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 95af321b4f5e23a4abe1e9af65e4d69a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2064,6 +2064,10 @@ MonoBehaviour:
   m_AnimationController: {fileID: 603287833}
   m_MotionMatchingFramesIntervalToUse: 10
   m_HipsTransform: {fileID: 5465940246045455945}
+  m_ApplyRotation: 1
+  m_ApplyTranslation: 1
+  m_ApplyMMInUpdate: 1
+  m_DeltaTime: 1
 --- !u!1 &2146520083
 GameObject:
   m_ObjectHideFlags: 0
