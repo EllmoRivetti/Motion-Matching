@@ -114,7 +114,6 @@ namespace MotionMatching.Animation
             return inverse.MultiplyPoint3x4(pos);
         }
 
-
         private void ApplyAnimationFrame(MocapFrameData frameData)
         {
             Debug.Log("ApplyAnimationFrame (from:" + frameData.m_FrameNumber + "; interval: " + m_MMAnimationFinished + ")");
@@ -154,7 +153,6 @@ namespace MotionMatching.Animation
 
             /*
             
-            
             if (m_ApplyRotation)
             {
 
@@ -188,6 +186,19 @@ namespace MotionMatching.Animation
             
 
 
+            if (m_ApplyTranslation)
+            {
+
+                Vector3 translationCharacter = new Vector3(
+                    frameData.m_PositionHipProjection.x - m_HipsTransform.position.x,
+                    0.0f,
+                    frameData.m_PositionHipProjection.z - m_HipsTransform.position.z
+                );
+                // 
+                // // Vector3 rotationCharacter = m_HipsTransform.eulerAngles - frameData.m_RotationHipProjection_ls_euler;
+                // 
+                transform.position += translationCharacter;
+            }
 
             m_AnimationController.RunNFramesFromFrame(
                 m_MotionMatchingFramesIntervalToUse, 

@@ -6,16 +6,10 @@ using MotionMatching.Animation;
 using MotionMatching.Matching;
 
 [RequireComponent(typeof(AnimationController))]
-public class Main : RunnableCoroutine
+public class Main : SerializedMonoBehaviour
 {
-	#region Members
-	[Header("Animations data")]
-	private AnimationController m_AnimationController;
-	public UnityAnimationConverter m_AnimationConverter;
     public LoadedAnimationFile m_AnimationToUse;
-
-	public string filename = "";
-	#endregion
+	private AnimationController m_AnimationController;
 
 	private void Awake()
 	{
@@ -25,50 +19,12 @@ public class Main : RunnableCoroutine
 
 	private void Start()
 	{
-		s_OnUpdateEvents += TraceExecTime;
 		BindFrameData();
-	}
-
-	[Button]
-	public void LoadAnimationFromFBXFile()
-    {
-		if (m_AnimationToUse)
-        {
-			m_AnimationToUse.m_FrameData = AnimationReader.GetFrameData(filename);
-			print("Successfully loaded animation data");
-		}
-
-	}
-
-	[Button]
-	public void LoadAnimationFromUnity(string animationPath)
-    {
-		// m_AnimationConverter.Create(animationPath);
-		// while (!m_AnimationConverter.CanRetrieveLoadedAnimationFile()) ;
-		// m_AnimationToUse = m_AnimationConverter.file;
-		// 
-		// Debug.Log("Created LoadedAnimationFile at " + animationPath);
 	}
 
 	[Button]
 	private void BindFrameData()
 	{
-		m_AnimationController.BindAnimationData(m_AnimationToUse.m_FrameData);
-		// m_AnimationController.FixDefaultPosition();
-		print("Successfully binded animation data to controller");
-
-		m_AnimationController.CopyBonesMatching();
-		print("Successfully copied bones matching from controller");
-
-		m_AnimationController.InitMocapFrameData();
-		print("Successfully initiated motion capture frame data");
-	}
-
-	private float m_tmp_timeSinceStart = 0.0f;
-	private void TraceExecTime(float deltaTime)
-	{
-		m_tmp_timeSinceStart += deltaTime;
-		// Debug.Log("Executing since " + m_tmp_timeSinceStart + " ms");
 	}
 
 }
