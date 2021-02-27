@@ -13,7 +13,6 @@ namespace MotionMatching.Animation
         public LoadedAnimationFile file;
         public Animator playerAnimator;
         private AnimatorClipInfo[] animationClip;
-        private AnimatorStateInfo animationInfo;
 
         public float m_AnimationSpeedMultiplicator;
         private float m_AnimationSpeed;
@@ -26,18 +25,14 @@ namespace MotionMatching.Animation
         {
             m_AnimationSpeed = m_AnimatorInitialSpeed * m_AnimationSpeedMultiplicator;
         }
-
-        // Start is called before the first frame update
+        
         void Start()
         {
-            animationInfo = playerAnimator.GetCurrentAnimatorStateInfo(0);
             animationClip = playerAnimator.GetCurrentAnimatorClipInfo(0);
             m_AnimatorInitialSpeed = playerAnimator.speed;
             m_AnimationSpeed = m_AnimatorInitialSpeed * m_AnimationSpeedMultiplicator;
             playerAnimator.speed = 0;
         }
-
-
         public void Create(string name)
         {
             file = ScriptableObject.CreateInstance<LoadedAnimationFile>();
@@ -47,31 +42,13 @@ namespace MotionMatching.Animation
 
             LoadAnimationFromUnityAnimator();
         }
-
         public bool CanRetrieveLoadedAnimationFile()
         {
             return !m_Busy;
         }
-
-        private void StartCreation(int frameCount)
-        {
-            if (m_Busy)
-                Debug.LogError("UnityAnimationConverter already busy!");
-            m_Busy = true;
-            m_MaxFrame = frameCount;
-            playerAnimator.enabled = true;
-        }
-
-        private void TryStopCreation(int currentFrame)
-        {
-            m_Busy = (m_Busy && m_MaxFrame == currentFrame);
-            playerAnimator.enabled = false;
-        }
-
         [Button]
         public void LoadAnimationFromUnityAnimator()
         {
-            
             playerAnimator.Play(animationClip[0].clip.name, -1, 0f);
             file.m_FrameData = new SortedDictionary<int, Dictionary<RigBodyParts, BoneData>>();
             playerAnimator.speed = m_AnimationSpeed * m_AnimationSpeedMultiplicator;
@@ -94,9 +71,6 @@ namespace MotionMatching.Animation
             AddFrameDataToLoadedAnimationFile(file, (int)frame);
             // StartCoroutine(NextFrame(frame));
         }
-
-
-        //public SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData;
 
         public void AddFrameDataToLoadedAnimationFile(LoadedAnimationFile file, int frame)
         {
@@ -147,53 +121,6 @@ namespace MotionMatching.Animation
             playerAnimator.speed = m_AnimationSpeed;
             // TryStopCreation(frame);
         }
-
-
-        private IEnumerator NextFrame(float frame)
-        {
-            var speed = playerAnimator.speed;
-            playerAnimator.speed = 0;
-            print("Adding frame: " + frame);
-            yield return waitForKeyPress(KeyCode.Space); // wait for this function to return
-            playerAnimator.speed = speed;
-        }
-
-
-        private IEnumerator waitForKeyPress(KeyCode key)
-        {
-            bool done = false;
-            while (!done) // essentially a "while true", but with a bool to break out naturally
-            {
-                if (Input.GetKeyDown(key))
-                {
-                    done = true; // breaks the loop
-                }
-                yield return null; // wait until next frame, then continue execution from here (loop continues)
-            }
-
-            // now this function returns
-        }
-
-
-        // Update is called once per frame
-        void Update()
-        {
-            // print(
-            //     playerAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.length * 
-            //    (playerAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime % 1) * playerAnimator.GetCurrentAnimatorClipInfo(0)[0].clip.frameRate);
-            // int currentFrame = (int)(animationClip[0].weight * (animationClip[0].clip.length * animationClip[0].clip.frameRate));
-            // float time = animationClip[0].clip.length * animationInfo.normalizedTime;
-            // print("---------------------");
-            // print("time: " + time);
-            // print("animationClip[0]: " + animationClip[0]);
-            // print("animationClip[0].clip: " + animationClip[0].clip);
-            // print("animationClip[0].clip.length: " + animationClip[0].clip.length);
-            // print("animationClip[0].clip.frameRate: " + animationClip[0].clip.frameRate);
-            // print("animationClip[0].weight: " + animationClip[0].weight);
-            // print("animationClip.Length: " + animationClip.Length);
-            // print("currentFrame: " + currentFrame);
-        }
-
 
         public void PrintEvent(string s)
         {
