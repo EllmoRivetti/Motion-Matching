@@ -203,7 +203,7 @@ namespace MotionMatching.Animation
             }
 				
 			m_LoadedMocapFrameData.m_FrameData = new SortedDictionary<int, MocapFrameData>();
-			for (int i_frame = 0; i_frame < m_FrameData.Count - 1; ++i_frame)
+			for (int i_frame = 0; i_frame < m_FrameData.Count - MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE; ++i_frame)
 			{
 				var frameData = CreateDataFromFrame(i_frame);
 				m_LoadedMocapFrameData.m_FrameData.Add(i_frame, frameData);
@@ -212,7 +212,7 @@ namespace MotionMatching.Animation
 		MocapFrameData CreateDataFromFrame(int i_frame)
         {
 			Vector3 positionHipProjection = m_FrameData[i_frame][RigBodyParts.hip].m_Position_ls;
-			Vector3 positionFuturHipProjection = m_FrameData[i_frame + 1][RigBodyParts.hip].m_Position_ls;
+			Vector3 positionFuturHipProjection = m_FrameData[i_frame + MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE][RigBodyParts.hip].m_Position_ls;
 
 			Vector3 positionRFeet = m_FrameData[i_frame][RigBodyParts.rFoot].m_Position_ls;
 			Vector3 positionLFeet = m_FrameData[i_frame][RigBodyParts.lFoot].m_Position_ls;
