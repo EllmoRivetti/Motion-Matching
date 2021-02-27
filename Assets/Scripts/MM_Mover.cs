@@ -33,7 +33,6 @@ namespace MotionMatching.Animation
         }
         void Update()
         {
-            print(transform.rotation);
             if (m_ApplyMMInUpdate)
                 RunMotionMatchingOnce(verbose: false);
         }
@@ -113,7 +112,6 @@ namespace MotionMatching.Animation
             return inverse.MultiplyPoint3x4(pos);
         }
 
-
         private void ApplyAnimationFrame(MocapFrameData frameData)
         {
             Debug.Log("ApplyAnimationFrame (from:" + frameData.m_FrameNumber + "; interval: " + m_MMAnimationFinished + ")");
@@ -137,19 +135,6 @@ namespace MotionMatching.Animation
             // Quaternion diff = m_HipsTransform.rotation * Quaternion.Inverse(frameData.m_RotationHipProjection_q);
             // transform.rotation = diff * transform.rotation;
 
-            if (m_ApplyTranslation)
-            {
-
-                Vector3 translationCharacter = new Vector3(
-                    frameData.m_PositionHipProjection.x - m_HipsTransform.position.x,
-                    0.0f,
-                    frameData.m_PositionHipProjection.z - m_HipsTransform.position.z
-                );
-                // 
-                // // Vector3 rotationCharacter = m_HipsTransform.eulerAngles - frameData.m_RotationHipProjection_ls_euler;
-                // 
-                transform.position += translationCharacter;
-            }
             if (m_ApplyRotation)
             {
 
@@ -166,6 +151,19 @@ namespace MotionMatching.Animation
                 m_HipsTransform.transform.localRotation = Quaternion.FromToRotation(currentOffset, desiredOffset);
             }
 
+            if (m_ApplyTranslation)
+            {
+
+                Vector3 translationCharacter = new Vector3(
+                    frameData.m_PositionHipProjection.x - m_HipsTransform.position.x,
+                    0.0f,
+                    frameData.m_PositionHipProjection.z - m_HipsTransform.position.z
+                );
+                // 
+                // // Vector3 rotationCharacter = m_HipsTransform.eulerAngles - frameData.m_RotationHipProjection_ls_euler;
+                // 
+                transform.position += translationCharacter;
+            }
 
             m_AnimationController.RunNFramesFromFrame(
                 m_MotionMatchingFramesIntervalToUse, 

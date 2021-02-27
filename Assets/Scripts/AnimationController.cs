@@ -20,7 +20,7 @@ namespace MotionMatching.Animation
 		public LoadedMocapFrameData m_LoadedMocapFrameData;
 
 		// frames number start at 1
-		[ShowInInspector, ReadOnly] public SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> m_FrameData; 
+		public LoadedAnimationFile m_AnimationToUse;
 
 		[Header("Parameters")]
 		public int m_FramesPerSecond = 30;
@@ -57,18 +57,19 @@ namespace MotionMatching.Animation
 					m_Bones[value] = null;
 				}
 			}
-
-			// // Swap frame
-			// if (Application.isPlaying)
-            // {
-			// 	var frameData = GetBonesDataForFrame(m_CurrentFrame);
-			// 	if (frameData != null)
-			// 		SetBonesData(frameData);
-            // }
 		}
 
-		#region Event buttons
-		[Button]
+        public void Start()
+        {
+			CopyBonesMatching();
+			print("Successfully copied bones matching from controller");
+
+			InitMocapFrameData();
+			print("Successfully initiated motion capture frame data");
+		}
+
+        #region Event buttons
+        [Button]
 		public void Run()
 		{
 			if (!m_AnimationCR_isRunning)
@@ -123,18 +124,12 @@ namespace MotionMatching.Animation
 		private IEnumerator RunAnimation()
 		{
 			if (!Application.isPlaying) yield return null;
-			// Animator[] characterAnimators = m_CharacterToAnimate.GetComponentsInChildren<Animator>();
-			// bool[] activeCharacterAnimators = new bool[characterAnimators.Length];
-
-			// DesactivateAllCharacterAnimators(characterAnimators, activeCharacterAnimators);
-
 
 			print("Running animation");
-			// RemoveNullBonesFromMBones();
 			while (
 				m_Run && 
 				!m_Pause && 
-				m_CurrentFrame <= m_FrameData.Count && 
+				m_CurrentFrame <= m_AnimationToUse.m_FrameData.Count && 
 				(m_FramesToRun == -1 || m_FramesToRun > 0) // parameter m_FramesToRun is not set OR parameter m_FramesToRun is set
 			)
 			{
@@ -163,7 +158,6 @@ namespace MotionMatching.Animation
 			m_AnimationCR_isRunning = false;
 			print("Finished animation");
 
-			// ResetAllCharacterAnimators(characterAnimators, activeCharacterAnimators);
 
 			// Run onAnimationEnd event and clear it from all subscribers
 			if (onAnimationEnd != null)
@@ -203,7 +197,7 @@ namespace MotionMatching.Animation
             }
 				
 			m_LoadedMocapFrameData.m_FrameData = new SortedDictionary<int, MocapFrameData>();
-			for (int i_frame = 0; i_frame < m_FrameData.Count - MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE; ++i_frame)
+			for (int i_frame = 0; i_frame < m_AnimationToUse.m_FrameData.Count - MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE; ++i_frame)
 			{
 				var frameData = CreateDataFromFrame(i_frame);
 				m_LoadedMocapFrameData.m_FrameData.Add(i_frame, frameData);
@@ -211,11 +205,11 @@ namespace MotionMatching.Animation
 		}
 		MocapFrameData CreateDataFromFrame(int i_frame)
         {
-			Vector3 positionHipProjection = m_FrameData[i_frame][RigBodyParts.hip].m_Position_ls;
-			Vector3 positionFuturHipProjection = m_FrameData[i_frame + MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE][RigBodyParts.hip].m_Position_ls;
+			Vector3 positionHipProjection = m_AnimationToUse.m_FrameData[i_frame][RigBodyParts.hip].m_Position_ls;
+			Vector3 positionFuturHipProjection = m_AnimationToUse.m_FrameData[i_frame + MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE][RigBodyParts.hip].m_Position_ls;
 
-			Vector3 positionRFeet = m_FrameData[i_frame][RigBodyParts.rFoot].m_Position_ls;
-			Vector3 positionLFeet = m_FrameData[i_frame][RigBodyParts.lFoot].m_Position_ls;
+			Vector3 positionRFeet = m_AnimationToUse.m_FrameData[i_frame][RigBodyParts.rFoot].m_Position_ls;
+			Vector3 positionLFeet = m_AnimationToUse.m_FrameData[i_frame][RigBodyParts.lFoot].m_Position_ls;
 
 			Vector3 rightFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionRFeet),
 					leftFeetPositionProjectedInHipSystem = InverseTransformPoint(positionHipProjection, Quaternion.identity, Vector3.one, positionLFeet);
@@ -231,41 +225,21 @@ namespace MotionMatching.Animation
 				positionHipProjection, // new Vector2(positionHipProjection.x, positionHipProjection.z),
 				positionFuturHipProjection, // new Vector2(positionFuturHipProjection.x, positionFuturHipProjection.z),
 				positionFeet,
-				m_FrameData[i_frame][RigBodyParts.hip].m_EulerAngles_ls_d,
-				m_FrameData[i_frame][RigBodyParts.hip].m_Rotation,
-				m_FrameData[i_frame][RigBodyParts.hip].m_Forward
+				m_AnimationToUse.m_FrameData[i_frame][RigBodyParts.hip].m_EulerAngles_ls_d,
+				m_AnimationToUse.m_FrameData[i_frame][RigBodyParts.hip].m_Rotation,
+				m_AnimationToUse.m_FrameData[i_frame][RigBodyParts.hip].m_Forward
 			);
 		}
 		#endregion
 
-
-
-		/*
-		 * Accepts only fbx file format
-		 * Constructs the m_FrameData structure and sets the m_LastFrameNumber
-		 * m_FrameData has to be ordered by the int 
-		 */
-		public void BindAnimationData(SortedDictionary<int, Dictionary<RigBodyParts, BoneData>> animation)
-		{
-			// m_FrameData = new SortedDictionary<int, Dictionary<RigBodyParts, BoneData>>();
-			// int limit = -1;
-			// foreach (var kvp in animation)
-			// {
-			//  if (limit == -1) 
-			// 	 	break;
-			// 	m_FrameData.Add(kvp.Key, kvp.Value);
-			//  limit--;
-            // }
-			m_FrameData = animation;
-		}
 		public void FixDefaultPosition()
         {
-			var firstFrame = m_FrameData[1];
-			for(int i = 2; i < m_FrameData.Count; ++i)
+			var firstFrame = m_AnimationToUse.m_FrameData[1];
+			for(int i = 2; i < m_AnimationToUse.m_FrameData.Count; ++i)
             {
-				if (m_FrameData.ContainsKey(i))
+				if (m_AnimationToUse.m_FrameData.ContainsKey(i))
                 {
-					var currentFrame = m_FrameData[i];
+					var currentFrame = m_AnimationToUse.m_FrameData[i];
 					List<RigBodyParts> keys = new List<RigBodyParts>(currentFrame.Keys);
 					foreach (RigBodyParts currentBoneName in keys)
                     {
@@ -273,7 +247,7 @@ namespace MotionMatching.Animation
 						BoneData firstFrameBoneObject = firstFrame[currentBoneName];
 
 						currentBoneObject.m_Position_ls = (currentBoneObject.m_Position_ls - firstFrameBoneObject.m_Position_ls) * .1f;
-						m_FrameData[i][currentBoneName] = currentBoneObject;
+						m_AnimationToUse.m_FrameData[i][currentBoneName] = currentBoneObject;
 						// currentBoneObject.m_Rotation -= firstFrameBoneObject.m_Rotation;
 						// currentBoneObject.m_Scale -= firstFrameBoneObject.m_Scale;
 
@@ -312,15 +286,15 @@ namespace MotionMatching.Animation
 
 		public Dictionary<RigBodyParts, BoneData> GetBonesDataForFrame(int frameNb)
         {
-			if (m_FrameData == null) return null;
+			if (m_AnimationToUse.m_FrameData == null) return null;
 
 			// print("GetBonesDataForFrame: " + frameNb);
-			// print(m_FrameData.ContainsKey(frameNb));
+			// print(m_AnimationToUse.m_FrameData.ContainsKey(frameNb));
 			//Return value
 			Dictionary <RigBodyParts, BoneData> interpolatedFrame = new Dictionary<RigBodyParts, BoneData>();
 			int firstFrame = -1, nextFrame = -1;
 
-			foreach (int i in m_FrameData.Keys)
+			foreach (int i in m_AnimationToUse.m_FrameData.Keys)
 			{
 				if (i < frameNb)
 				{
@@ -341,7 +315,7 @@ namespace MotionMatching.Animation
 				}
 				else// frameNb == bonesData.key
 				{
-					return m_FrameData[i];
+					return m_AnimationToUse.m_FrameData[i];
 				}
 			}
 
@@ -349,13 +323,13 @@ namespace MotionMatching.Animation
 			// print("Found: " + firstFrame);
 			// print("Next: " + nextFrame);
 
-			var firstFrameData = m_FrameData[firstFrame];
-			var nextFrameData = m_FrameData[nextFrame];
+			var firstFrameData = m_AnimationToUse.m_FrameData[firstFrame];
+			var nextFrameData = m_AnimationToUse.m_FrameData[nextFrame];
 
 			if (firstFrameData == null || nextFrameData == null)
 				Debug.LogError("Something went wrong in GetBonesDataForFrame", this);
 
-			foreach (var currentBoneData in m_FrameData[firstFrame])
+			foreach (var currentBoneData in m_AnimationToUse.m_FrameData[firstFrame])
 			{
 				RigBodyParts bodyPartName = currentBoneData.Key;
 				BoneData interpolatedBodyPartData = GetBoneDataForFrameT(
