@@ -120,42 +120,6 @@ namespace MotionMatching.Animation
 		}
 		#endregion
 
-		private void RemoveNullBonesFromMBones()
-		{
-			if (!Application.isPlaying)
-			{
-				Debug.LogError("Please enter play mode to run this method!");
-				return;
-			}
-			List<RigBodyParts> bones = new List<RigBodyParts>();
-			foreach (var bone in m_Bones)
-			{
-				if (bone.Value == null)
-				{
-					bones.Add(bone.Key);
-				}
-			}
-			bones.ForEach(x => m_Bones.Remove(x));
-		}
-
-
-		private void DesactivateAllCharacterAnimators(Animator[] characterAnimators, bool[] activeCharacterAnimators)
-        {
-			for (int i_animator = 0; i_animator < characterAnimators.Length; i_animator++)
-			{
-				activeCharacterAnimators[i_animator] = characterAnimators[i_animator].enabled;
-				characterAnimators[i_animator].enabled = false;
-			}
-		}
-		private void ResetAllCharacterAnimators(Animator[] characterAnimators, bool[] activeCharacterAnimators)
-        {
-			for (int i_animator = 0; i_animator < characterAnimators.Length; i_animator++)
-			{
-				characterAnimators[i_animator].enabled = activeCharacterAnimators[i_animator];
-			}
-		}
-
-
 		private IEnumerator RunAnimation()
 		{
 			if (!Application.isPlaying) yield return null;
