@@ -63,16 +63,21 @@ namespace MotionMatching.Matching
 
         public float GetFrameScore(Vector2 hipTarget)
         {
+            //Angle inbtw 
+            Vector3 projectionDirection = m_PositionFuturHipProjection - m_PositionHipProjection;
+            float angleHip = Vector2.Angle(new Vector2(projectionDirection.x, projectionDirection.z), hipTarget);
+
+            return angleHip;
+
+            /*
             //Pied * 0.3
             float distFeet = this.m_PositionFeet.GetInBetweenDistance() * 0.3f;
-
-            //Angle inbtw 
-            float angleHip = Vector2.Angle(this.m_PositionHipProjection, hipTarget);
-
             //Sum
+
             float sum = distFeet + angleHip;
 
             return sum;
+            */
         }
 
     }

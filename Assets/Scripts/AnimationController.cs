@@ -203,7 +203,7 @@ namespace MotionMatching.Animation
             }
 				
 			m_LoadedMocapFrameData.m_FrameData = new SortedDictionary<int, MocapFrameData>();
-			for (int i_frame = 0; i_frame < m_FrameData.Count - MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE; ++i_frame)
+			for (int i_frame = 0; i_frame < m_FrameData.Count - Constants.MM_NEXT_FRAME_INTERVAL_SIZE; ++i_frame)
 			{
 				var frameData = CreateDataFromFrame(i_frame);
 				m_LoadedMocapFrameData.m_FrameData.Add(i_frame, frameData);

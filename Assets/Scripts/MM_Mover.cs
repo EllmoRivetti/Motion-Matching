@@ -33,7 +33,7 @@ namespace MotionMatching.Animation
         }
         void Update()
         {
-            print(transform.rotation);
+            //print(transform.rotation);
             if (m_ApplyMMInUpdate)
                 RunMotionMatchingOnce(verbose: false);
         }
@@ -82,8 +82,9 @@ namespace MotionMatching.Animation
             float bestScore = -1;
             MocapFrameData bestFrame = null;
 
-            foreach (var kvp in m_AnimationController.m_LoadedMocapFrameData.m_FrameData)
+            foreach (var kvp in m_AnimationController.m_LoadedMocapFrameData.m_FrameData) //  count - n
             {
+                //i ~ i + n
                 var frame = kvp.Value;
                 var score = frame.GetFrameScore(new Vector2(movement.x, movement.z));
 
@@ -118,9 +119,23 @@ namespace MotionMatching.Animation
         {
             Debug.Log("ApplyAnimationFrame (from:" + frameData.m_FrameNumber + "; interval: " + m_MMAnimationFinished + ")");
 
+            Debug.Log("Position hip framedata" + frameData.m_PositionHipProjection);
+            Debug.Log("Position rotation framedata" + frameData.m_RotationHipProjection);
+
+            Debug.Log("OUR position " + transform.localPosition);
             // transform -> character
             // m_HipsTransform -> courant
             // frameData -> nouvelle
+
+
+
+            if(m_ApplyRotation)
+            {
+                Vector3 v = new Vector3(0, frameData.m_RotationHipProjection.y, 0);
+                transform.localRotation = Quaternion.Euler(v);
+
+                //transform.Rotate(0, frameData.m_RotationHipProjection.y, 0, Space.Self);
+            }
 
 
             // // Fix rotation
@@ -137,19 +152,9 @@ namespace MotionMatching.Animation
             // Quaternion diff = m_HipsTransform.rotation * Quaternion.Inverse(frameData.m_RotationHipProjection_q);
             // transform.rotation = diff * transform.rotation;
 
-            if (m_ApplyTranslation)
-            {
-
-                Vector3 translationCharacter = new Vector3(
-                    frameData.m_PositionHipProjection.x - m_HipsTransform.position.x,
-                    0.0f,
-                    frameData.m_PositionHipProjection.z - m_HipsTransform.position.z
-                );
-                // 
-                // // Vector3 rotationCharacter = m_HipsTransform.eulerAngles - frameData.m_RotationHipProjection_ls_euler;
-                // 
-                transform.position += translationCharacter;
-            }
+            /*
+            
+            
             if (m_ApplyRotation)
             {
 
@@ -164,7 +169,24 @@ namespace MotionMatching.Animation
                 // transform.RotateAround(transform.position, transform.up, angle);
                 // transform.Rotate(transform.up, angle);
                 m_HipsTransform.transform.localRotation = Quaternion.FromToRotation(currentOffset, desiredOffset);
+            }*/
+            if (m_ApplyTranslation)
+            {
+                /*
+                Vector3 translationCharacter = new Vector3(
+                    frameData.m_PositionHipProjection.x - transform.localPosition.x,
+                    0.0f,
+                    frameData.m_PositionHipProjection.z - transform.localPosition.z
+                );
+                // 
+                // // Vector3 rotationCharacter = m_HipsTransform.eulerAngles - frameData.m_RotationHipProjection_ls_euler;
+                // 
+                transform.localPosition = translationCharacter;*/
+
+                transform.localPosition = frameData.m_PositionHipProjection - m_HipsTransform.localPosition;
             }
+            
+
 
 
             m_AnimationController.RunNFramesFromFrame(
