@@ -62,10 +62,10 @@ namespace MotionMatching.Animation
         public void Start()
         {
 			CopyBonesMatching();
-			print("Successfully copied bones matching from controller");
+			//print("Successfully copied bones matching from controller");
 
 			InitMocapFrameData();
-			print("Successfully initiated motion capture frame data");
+			//print("Successfully initiated motion capture frame data");
 		}
 
         #region Event buttons
@@ -84,7 +84,7 @@ namespace MotionMatching.Animation
 		[Button]
 		public void RunFromFrame(int i_frame)
         {
-			print("RunFromFrame(" + i_frame + ")");
+			//print("RunFromFrame(" + i_frame + ")");
 			m_CurrentFrame = i_frame;
 			Run();
 		}
@@ -125,7 +125,7 @@ namespace MotionMatching.Animation
 		{
 			if (!Application.isPlaying) yield return null;
 
-			print("Running animation");
+			//print("Running animation");
 			while (
 				m_Run && 
 				!m_Pause && 
@@ -156,7 +156,7 @@ namespace MotionMatching.Animation
 
 			}
 			m_AnimationCR_isRunning = false;
-			print("Finished animation");
+			//print("Finished animation");
 
 
 			// Run onAnimationEnd event and clear it from all subscribers

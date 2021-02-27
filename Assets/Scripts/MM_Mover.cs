@@ -181,7 +181,8 @@ namespace MotionMatching.Animation
                 // 
                 transform.localPosition = translationCharacter;*/
 
-                transform.localPosition = frameData.m_PositionHipProjection - m_HipsTransform.localPosition;
+                //transform.localPosition = -frameData.m_PositionHipProjection;
+                transform.localPosition -= (frameData.m_PositionHipProjection - m_HipsTransform.localPosition); 
             }
             
 

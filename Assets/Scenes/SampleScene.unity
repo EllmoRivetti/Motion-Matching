@@ -304,12 +304,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  m_UpdateDeltaTime: 0.5
-  m_Run: 1
-  m_Pause: 0
-  m_AnimationConverter: {fileID: 0}
-  m_AnimationToUse: {fileID: 11400000, guid: c2da8bd06ef01e5459f0dc497c7cbaef, type: 2}
-  filename: 
+  m_AnimationToUse: {fileID: 11400000, guid: ab5c36be9642acb4398514b9ac83f44a, type: 2}
 --- !u!4 &603287831
 Transform:
   m_ObjectHideFlags: 0
@@ -938,15 +933,13 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: m_FrameData
-      Entry: 6
-      Data: 
   m_CharacterToAnimate: {fileID: 2079202616}
   m_ApplyXZPositionTransformationToCharacter: 0
   bonesMatching: {fileID: 11400000, guid: 8da94fccd5decea45944557d01e32d56, type: 2}
   m_LoadedMocapFrameData: {fileID: 11400000, guid: f47b04a2ef1e16744992388b5a45e6c2, type: 2}
+  m_AnimationToUse: {fileID: 11400000, guid: ab5c36be9642acb4398514b9ac83f44a, type: 2}
   m_FramesPerSecond: 30
-  m_FramesToRun: -1
+  m_FramesToRun: 10
 --- !u!1 &677737722
 GameObject:
   m_ObjectHideFlags: 0
@@ -1925,7 +1918,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079202615}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.64, z: 0}
+  m_LocalPosition: {x: -7.06, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 543450651888359133}
@@ -2007,7 +2000,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079202615}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 9000000, guid: bad187a12c831be458464e1326171251, type: 3}
   m_Controller: {fileID: 9100000, guid: db15b3f7536a09d449ea261e69cb84c2, type: 2}
   m_CullingMode: 1
@@ -2025,13 +2018,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079202615}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95a6d9f876ac5b7409228c5036850646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_BonesMatching: {fileID: 11400000, guid: 8da94fccd5decea45944557d01e32d56, type: 2}
-  file: {fileID: 11400000, guid: c2da8bd06ef01e5459f0dc497c7cbaef, type: 2}
+  file: {fileID: 11400000, guid: ab5c36be9642acb4398514b9ac83f44a, type: 2}
   playerAnimator: {fileID: 2079202621}
   m_AnimationSpeedMultiplicator: 2
 --- !u!136 &2079202623
@@ -2055,7 +2048,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079202615}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9da7cf152f420b9438b14891c3f12f82, type: 3}
   m_Name: 
@@ -2064,9 +2057,9 @@ MonoBehaviour:
   m_AnimationController: {fileID: 603287833}
   m_MotionMatchingFramesIntervalToUse: 10
   m_HipsTransform: {fileID: 5465940246045455945}
-  m_ApplyRotation: 1
+  m_ApplyRotation: 0
   m_ApplyTranslation: 1
-  m_ApplyMMInUpdate: 1
+  m_ApplyMMInUpdate: 0
   m_DeltaTime: 1
 --- !u!1 &2146520083
 GameObject:
