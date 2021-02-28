@@ -72,6 +72,7 @@ namespace MotionMatching.Animation
             Vector3 characterMovement = GetCharacterMovement();
 
             var bestFrame = GetBestFrame(characterMovement);
+            m_CurrentFrameData = bestFrame;
             ApplyAnimationFrame(bestFrame);
 
             yield return null;
@@ -81,7 +82,6 @@ namespace MotionMatching.Animation
         {
             // Debug.Log("----------------------------");
             // Debug.Log("inside GetBestFrame");
-            // Debug.Log(movement);
 
             float bestScore = -1;
             MocapFrameData bestFrame = null;
@@ -98,7 +98,7 @@ namespace MotionMatching.Animation
                     bestFrame = frame;
                 }
             }
-            // Debug.Log(bestScore);
+            Debug.Log(bestScore);
             // Debug.Log(bestFrame);
             return bestFrame;
         }
@@ -123,42 +123,105 @@ namespace MotionMatching.Animation
             if (m_CurrentFrameData != null)
             {
                 Vector3 characterMovement = GetCharacterMovement();
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(m_HipsTransform.position, m_HipsTransform.position + characterMovement);
 
                 Gizmos.color = Color.yellow;
-                Vector3 pos = transform.position + m_CurrentFrameData.m_PositionHipProjection;
-                Vector3 nextPos = transform.position + m_CurrentFrameData.m_PositionFuturHipProjection;
+
+                Vector3 pos = m_HipsTransform.position + m_CurrentFrameData.m_PositionHipProjection;
+                Vector3 nextPos = m_HipsTransform.position + m_CurrentFrameData.m_PositionFuturHipProjection;
                 Vector3 fwd = nextPos - pos;
                 Gizmos.DrawCube(pos, Vector3.one * .4f);
                 Gizmos.DrawRay(pos, fwd * 5 * 5);
-
-
-                Gizmos.color = Color.green;
-                float yRotationAngle = Vector3.Angle(m_HipsTransform.forward, fwd);
-                float yRotationAngleFromDotProduct = (float) Math.Acos(Vector3.Dot(fwd, characterMovement) / (fwd.magnitude * characterMovement.magnitude));
-                Vector3 rotatedFwd = Quaternion.AngleAxis(yRotationAngleFromDotProduct, transform.up) * fwd;
-                Gizmos.DrawLine(pos, rotatedFwd);
-
-                Gizmos.color = Color.blue;
-                Gizmos.DrawLine(pos, pos + characterMovement);
             }
         }
 
-        public void ApplyAnimationFrameAdaptRotation()
+        public void ApplyAnimationFrameAdaptRotationBeforeAnimation()
         {
-            Vector3 hipsPositionBeforeRotation = m_HipsTransform.transform.position;
-            // transform.localRotation = Quaternion.AngleAxis(-frameData.m_RotationHipProjection.y, transform.up);
+#if ROTATE_CHARACTER
+            /*
+             * Calcul de la rotation effective
+             * Il s'agit de la rotation qui a été effectué pendant l'animation qu'il faut conserver
+             * lors de l'attribution d'une nouvelle animation
+             */
 
-            Vector3 hipsForward = m_HipsTransform.forward;
-            Vector3 directionTowardsDestination = GetCharacterMovement();
-            float yRotationAngle = Vector3.Angle(hipsForward, directionTowardsDestination);
 
-            transform.Rotate(0, yRotationAngle, 0, Space.Self);
+            float effectiveRotation = m_HipsTransform.rotation.y - transform.rotation.y;
+            Debug.Log("effective rotation : " + effectiveRotation);
 
-            Vector3 hipsPositionAfterRotation = m_HipsTransform.transform.position;
-            Vector3 rotationTranslation = hipsPositionAfterRotation - hipsPositionBeforeRotation;
-            transform.position -= rotationTranslation;
 
-            //transform.Rotate(0, frameData.m_RotationHipProjection.y, 0, Space.Self);
+            Debug.Log("INITIAL pos : " + m_HipsTransform.position);
+
+
+            /*
+             * Pour prévoir et translater le mouvement (en arc de cercle) qui est fait lors
+             * de la rotation sur l'objet parent
+             * Il faut que l'objet fils soit déjà déplacé
+             * 
+             * Du coup, on applique le futur déplacement (pour le retirer par la suite
+             */
+
+            Vector3 tempFuturMovement = m_CurrentFrameData.m_PositionHipProjection;
+            m_HipsTransform.localPosition += tempFuturMovement;
+
+
+            // On retient ou se trouve la position après le simple déplacement
+            Vector3 oldPos = m_HipsTransform.position;
+
+
+
+            // On applique la rotation depuis la frame data, en conservant la rotation effective (toujours négatif)
+            // Il est possible que ce soit (-effectiveRotation au lieu de +
+            Vector3 newRotation = Vector3.up * (+effectiveRotation - m_CurrentFrameData.m_RotationHipProjection.y);
+            Debug.Log("New Rotation : " + newRotation);
+            transform.rotation = Quaternion.Euler(newRotation);
+
+            // On retient la nouvelle position qui a changé : le but est de corriger le déplacement
+            Vector3 newPos = m_HipsTransform.position;
+
+            Debug.Log("Old hip pos : " + oldPos);
+            Debug.Log("New hip pos : " + newPos);
+
+            // Le vecteur de déplacement est simplement la soustraction des deux
+            Vector3 sumFromMovement = oldPos - newPos;
+
+            // On peut maintenant retirer le déplacement temporaire
+            // L'objet transform.position est toujours "initial", il n'a pas bougé
+
+            m_HipsTransform.localPosition -= tempFuturMovement;
+
+
+            Debug.Log("La position AVANT la translation : " + transform.localPosition);
+            // Et maintenant, on ajoute le déplacement qui a été effectué a la position du parent
+            // Pour remettre "à 0" la rotation qui a été effectuée
+            // ATTENTION : DOIT quand même agir comme une téléportation : seul m_ApplyTransformation permet de corriger l'emplacement d'où est joué l'animation
+            transform.localPosition += sumFromMovement;
+
+            Debug.Log("La position APRES la translation : " + transform.localPosition);
+
+
+            /*
+             * Le problème : c'est que ça marche pas.
+             * sumFromMovement contient bien la bonne valeur à ajouter a position/localPosition (c'est pareil puisque il est a la racine de la scène)
+             * lorsque l'on ajoute et qu'on débug, la bonne valeure est bien écrite
+             * Sauf qu'à l'inspecteur, il n'est pas au bon endroit
+             * Et hormis ça, rien d'autre n'a l'air de toucher au déplacement du character
+             * (Si on retire la ligne, il reste en 0 0)
+             * 
+             * Du coup jsp c'est un bug chelou
+             */
+#endif
+        }
+        public void ApplyAnimationFrameAdaptRotationAfterAnimation()
+        {
+            // Quaternion initialHipsOrientation = m_HipsTransform.rotation;
+            // m_HipsTransform.LookAt(m_Destination);
+            // Transform hipsParent = m_HipsTransform.parent;
+            // 
+            // Quaternion diff = m_HipsTransform.rotation * Quaternion.Inverse(initialHipsOrientation);
+            // hipsParent.rotation = diff * hipsParent.rotation;
+            // 
+            // // m_HipsTransform.rotation = initialHipsOrientation;
         }
         public void ApplyAnimationFrameAdaptTranslation()
         {
@@ -166,141 +229,16 @@ namespace MotionMatching.Animation
         }
         private void ApplyAnimationFrame(MocapFrameData frameData)
         {   
-            m_CurrentFrameData = frameData;
             Debug.Log("ApplyAnimationFrame (from:" + frameData.m_FrameNumber + "; interval: " + m_MMAnimationFinished + ")");
 
-            Debug.Log("Position hip framedata" + frameData.m_PositionHipProjection);
-            Debug.Log("Position rotation framedata" + frameData.m_RotationHipProjection);
+            Debug.Log("hip framedata Position " + frameData.m_PositionHipProjection);
+            Debug.Log("hip framedata Rotation " + frameData.m_RotationHipProjection);
 
-            //Debug.Log("OUR local PR " + transform.localPosition + " " + transform.localRotation);
-            // transform -> character
-            // m_HipsTransform -> courant
-            // frameData -> nouvelle
-
-
-            if(m_ApplyRotation)
-            {
-
-
-
-                /*
-                 * Calcul de la rotation effective
-                 * Il s'agit de la rotation qui a été effectué pendant l'animation qu'il faut conserver
-                 * lors de l'attribution d'une nouvelle animation
-                 */
-
-
-                float effectiveRotation = m_HipsTransform.rotation.y - transform.rotation.y;
-                Debug.Log("effective rotation : " + effectiveRotation);
-
-
-                Debug.Log("INITIAL pos : " + m_HipsTransform.position);
-
-
-                /*
-                 * Pour prévoir et translater le mouvement (en arc de cercle) qui est fait lors
-                 * de la rotation sur l'objet parent
-                 * Il faut que l'objet fils soit déjà déplacé
-                 * 
-                 * Du coup, on applique le futur déplacement (pour le retirer par la suite
-                 */
-
-                Vector3 tempFuturMovement = frameData.m_PositionHipProjection;
-                m_HipsTransform.localPosition += tempFuturMovement;
-
-
-                // On retient ou se trouve la position après le simple déplacement
-                Vector3 oldPos = m_HipsTransform.position;
-
-
-
-                // On applique la rotation depuis la frame data, en conservant la rotation effective (toujours négatif)
-                // Il est possible que ce soit (-effectiveRotation au lieu de +
-                Vector3 newRotation = Vector3.up * (+effectiveRotation - frameData.m_RotationHipProjection.y);
-                Debug.Log("New Rotation : " + newRotation);
-                transform.eulerAngles = newRotation;
-
-                // On retient la nouvelle position qui a changé : le but est de corriger le déplacement
-                Vector3 newPos = m_HipsTransform.position;
-
-                Debug.Log("Old hip pos : " + oldPos);
-                Debug.Log("New hip pos : " + newPos);
-
-                // Le vecteur de déplacement est simplement la soustraction des deux
-                Vector3 sumFromMovement = oldPos - newPos;
-
-                // On peut maintenant retirer le déplacement temporaire
-                // L'objet transform.position est toujours "initial", il n'a pas bougé
-
-                m_HipsTransform.localPosition -= tempFuturMovement;
-
-
-                Debug.Log("La position AVANT la translation : " + transform.localPosition);
-                // Et maintenant, on ajoute le déplacement qui a été effectué a la position du parent
-                // Pour remettre "à 0" la rotation qui a été effectuée
-                // ATTENTION : DOIT quand même agir comme une téléportation : seul m_ApplyTransformation permet de corriger l'emplacement d'où est joué l'animation
-                transform.localPosition += sumFromMovement;
-
-                Debug.Log("La position APRES la translation : " + transform.localPosition);
-
-
-                /*
-                 * Le problème : c'est que ça marche pas.
-                 * sumFromMovement contient bien la bonne valeur à ajouter a position/localPosition (c'est pareil puisque il est a la racine de la scène)
-                 * lorsque l'on ajoute et qu'on débug, la bonne valeure est bien écrite
-                 * Sauf qu'à l'inspecteur, il n'est pas au bon endroit
-                 * Et hormis ça, rien d'autre n'a l'air de toucher au déplacement du character
-                 * (Si on retire la ligne, il reste en 0 0)
-                 * 
-                 * Du coup jsp c'est un bug chelou
-                 */
-
-            }
-
-            //Debug.Log("OUR NEW local position AND rotation : " + transform.localPosition + " " + transform.localRotation);
-
-        // transform -> character
-        // m_HipsTransform -> courant
-        // frameData -> nouvelle
-
-
-
-
-        // // Fix rotation
-        // transform.Rotate(Vector3.up * m_RotationFoundInMM);
-        // 
-        // // Fix position
-        // Vector3 translation = frameData.m_PositionHipProjection - m_HipsTransform.localPosition;
-        // transform.localPosition += translation;
-
-        // float angle = Quaternion.Angle(m_HipsTransform.rotation, frameData.m_RotationHipProjection_q);
-        // transform.Rotate(transform.up, angle);
-        // transform.rotation = angle;
-
-        // Quaternion diff = m_HipsTransform.rotation * Quaternion.Inverse(frameData.m_RotationHipProjection_q);
-        // transform.rotation = diff * transform.rotation;
-
-        /*
-
-        if (m_ApplyRotation)
-        {
-
-            Vector3 armPosition = m_HipsTransform.position;
-            Vector3 handPosition = armPosition + m_HipsTransform.forward;
-            Vector3 boxPosition = frameData.m_PositionHipProjection + frameData.m_HipProjectionForward;
-
-            Vector3 currentOffset = m_HipsTransform.InverseTransformPoint(handPosition);
-            Vector3 desiredOffset = InverseTransformPoint(armPosition, boxPosition, Quaternion.identity, Vector3.one);
-
-            // float angle = Quaternion.Angle(m_HipsTransform.rotation, frameData.m_RotationHipProjection_q);
-            // transform.RotateAround(transform.position, transform.up, angle);
-            // transform.Rotate(transform.up, angle);
-            m_HipsTransform.transform.localRotation = Quaternion.FromToRotation(currentOffset, desiredOffset);
-        }*/
+            // m_HipsTransform.parent.Rotate(m_HipsTransform.parent.transform.up, 180.0f);
 
             if (m_ApplyRotation)
             {
-                //ApplyAnimationFrameAdaptRotation();
+                ApplyAnimationFrameAdaptRotationBeforeAnimation();
             }
             if (m_ApplyTranslation)
             {
@@ -319,6 +257,10 @@ namespace MotionMatching.Animation
             else
             {
                 m_MMAnimationFinished = true;
+            }
+            if (m_ApplyRotation)
+            {
+                ApplyAnimationFrameAdaptRotationAfterAnimation();
             }
 
         }

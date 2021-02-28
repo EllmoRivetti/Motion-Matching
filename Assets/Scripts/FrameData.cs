@@ -61,13 +61,29 @@ namespace MotionMatching.Matching
             this.m_HipProjectionForward = hipProjectionForward;
         }
 
-        public float GetFrameScore(Vector2 hipTarget)
+        private float AngleBetweenVector2(Vector2 vec1, Vector2 vec2)
         {
-            //Angle inbtw 
-            Vector3 projectionDirection = m_PositionFuturHipProjection - m_PositionHipProjection;
-            float angleHip = Vector2.Angle(new Vector2(projectionDirection.x, projectionDirection.z), hipTarget);
+            Vector2 diference = vec2 - vec1;
+            float sign = (vec2.y < vec1.y) ? -1.0f : 1.0f;
+            return Vector2.Angle(Vector2.right, diference) * sign;
+        }
 
-            return angleHip;
+        public float GetFrameScore(Vector2 desiredMovement)
+        {
+            //Angle inbtw   
+            Vector2 projectionForward = (new Vector2(m_PositionFuturHipProjection.x, m_PositionFuturHipProjection.z) - new Vector2(m_PositionHipProjection.x, m_PositionHipProjection.z)) * 5.0f;
+            float angle = Vector2.SignedAngle(desiredMovement, projectionForward);
+
+
+            //Angle inbtw 
+            // Vector3 projectionDirection = m_PositionFuturHipProjection - m_PositionHipProjection;
+            float angleHip = Vector2.Angle(projectionForward, desiredMovement);
+
+            // return angleHip;
+
+            if (Mathf.Abs(angle) < MotionMatching.Constants.EPSILON)
+                return 100;
+            return 1.0f / angle;
 
             /*
             //Pied * 0.3
