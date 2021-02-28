@@ -13,7 +13,7 @@ public class PathMover : MonoBehaviour
     private void Awake()
     {
         m_Agent = GetComponent<NavMeshAgent>();
-        FindObjectOfType<PathCreator>().OnNewPathCreated += SetPoints;
+        FindObjectOfType<PathCreator>().m_OnNewPathCreated += SetPoints;
     }
     private void SetPoints(IEnumerable<Vector3> points)
     {

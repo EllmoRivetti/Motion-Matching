@@ -1,11 +1,6 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
-using UnityEngine.AI;
-using System;
 using MotionMatching.Matching;
-using MotionMatching.Animation;
 using Sirenix.OdinInspector;
 
 
@@ -13,71 +8,88 @@ namespace MotionMatching.Animation
 {
     public class MM_Mover : MonoBehaviour
     {
-        public Transform m_Destination;
-        [Range(0.0f, 5.0f)] public float m_StopDistance;
-        [ReadOnly] public int m_RecommendedFramesIntervalToUse = MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE;
-        [Range(0, 50)] public int m_MotionMatchingFramesIntervalToUse = MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE;
+        #region Members
+        public Transform m_DestinationTransform;
         public Transform m_HipsTransform;
+
+        [Range(0.0f, 5.0f)] public float m_StopDistance_ua;
+        [ReadOnly] public int m_RecommendedFramesIntervalToUse = MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE;
+        [Range(0, 50)] public int m_FramesIntervalToUse = MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE;
 
         [ReadOnly] public bool m_ApplyRotation = false;
         public bool m_ApplyTranslation = true;
         public bool m_ApplyAnimation = true;
         public bool m_ApplyMMInUpdate = true;
-        public float m_DeltaTime = 1.0f;
+        public float m_TimeScale = 1.0f;
 
-        private bool m_CalculatingMotionMatchingFrame = false;
-        private bool m_MMAnimationFinished = true;
+        bool m_CalculatingFrame = false;
+        bool m_FrameIntervalIsRunning = true;
         AnimationController m_AnimationController;
         MocapFrameData m_CurrentFrameData;
+        #endregion
 
-
+        #region Unity events
         private void Awake()
         {
             m_AnimationController = GetComponent<AnimationController>();
         }
         private void OnValidate()
         {
-            Time.timeScale = m_DeltaTime;
+            Time.timeScale = m_TimeScale;
         }
         void Update()
         {
-            if (m_ApplyMMInUpdate && !ReachedTarget(m_Destination.position))
+            if (m_ApplyMMInUpdate && !ReachedTarget(m_DestinationTransform.position))
                 RunMotionMatchingOnce(verbose: false);
         }
-
-        private bool ReachedTarget(Vector3 target)
+        public void OnDrawGizmos()
         {
-            float currentDistance = Vector2.Distance(new Vector2(m_HipsTransform.position.x, m_HipsTransform.position.z), new Vector2(target.x, target.z));
-            return currentDistance <= m_StopDistance;
-        }
+            if (m_CurrentFrameData != null)
+            {
+                Vector3 characterMovement = GetCharacterMovement();
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(m_HipsTransform.position, m_HipsTransform.position + characterMovement);
 
+                Gizmos.color = Color.yellow;
+
+                Vector3 pos = m_HipsTransform.position + m_CurrentFrameData.m_PositionHipProjection;
+                Vector3 nextPos = m_HipsTransform.position + m_CurrentFrameData.m_PositionFuturHipProjection;
+                Vector3 fwd = nextPos - pos;
+                Gizmos.DrawCube(pos, Vector3.one * .4f);
+                Gizmos.DrawRay(pos, fwd * 5 * 5);
+            }
+        }
+        #endregion
+        #region Run Motion Matching
         [Button]
         public void RunMotionMatchingOnce(bool verbose = true)
         {
-            if (!m_CalculatingMotionMatchingFrame && m_MMAnimationFinished == true)
+            if (!m_CalculatingFrame && m_FrameIntervalIsRunning == true)
             {
-                m_CalculatingMotionMatchingFrame = true;
+                m_CalculatingFrame = true;
                 StartCoroutine(MoveUsingMotionMatching());
-                m_CalculatingMotionMatchingFrame = false;
+                m_CalculatingFrame = false;
             }
-            else 
+            else
             {
                 if (verbose)
                     Debug.Log("MotionMatching Already running");
             }
         }
-
-
+        private bool ReachedTarget(Vector3 target)
+        {
+            float currentDistance = Vector2.Distance(new Vector2(m_HipsTransform.position.x, m_HipsTransform.position.z), new Vector2(target.x, target.z));
+            return currentDistance <= m_StopDistance_ua;
+        }
         private Vector3 GetCharacterMovement()
         {
-            Vector3 movementDestination = m_Destination.position;
+            Vector3 movementDestination = m_DestinationTransform.position;
             Vector3 currentCharacterPosition = m_HipsTransform.position;
             return movementDestination - currentCharacterPosition;
         }
-
         private IEnumerator MoveUsingMotionMatching()
         {
-            m_MMAnimationFinished = false;
+            m_FrameIntervalIsRunning = false;
             Vector3 characterMovement = GetCharacterMovement();
 
             var bestFrame = GetBestFrame(characterMovement);
@@ -86,7 +98,6 @@ namespace MotionMatching.Animation
 
             yield return null;
         }
-
         private MocapFrameData GetBestFrame(Vector3 movement)
         {
             // Debug.Log("----------------------------");
@@ -111,40 +122,45 @@ namespace MotionMatching.Animation
             // Debug.Log(bestFrame);
             return bestFrame;
         }
-
-        [Button]
-        public void RunFromFrame(int frame)
+        private void ApplyAnimationFrame(MocapFrameData frameData)
         {
-            ApplyAnimationFrame(m_AnimationController.m_LoadedMocapFrameData.m_FrameData[frame]);
-        }
+            Debug.Log("ApplyAnimationFrame (from:" + frameData.m_FrameNumber + "; interval: " + m_FrameIntervalIsRunning + ")");
 
-        // https://forum.unity.com/threads/transform-inversetransformpoint-without-transform.954939/
-        // https://twitter.com/georgerrmartin_/status/410279960624918529?lang=fr
-        Vector3 InverseTransformPoint(Vector3 transforPos, Vector3 pos, Quaternion transformRotation, Vector3 transformScale)
-        {
-            Matrix4x4 matrix = Matrix4x4.TRS(transforPos, transformRotation, transformScale);
-            Matrix4x4 inverse = matrix.inverse;
-            return inverse.MultiplyPoint3x4(pos);
-        }
+            Debug.Log("hip framedata Position " + frameData.m_PositionHipProjection);
+            Debug.Log("hip framedata Rotation " + frameData.m_RotationHipProjection);
 
-        public void OnDrawGizmos()
-        {
-            if (m_CurrentFrameData != null)
+            // m_HipsTransform.parent.Rotate(m_HipsTransform.parent.transform.up, 180.0f);
+
+            if (m_ApplyRotation)
             {
-                Vector3 characterMovement = GetCharacterMovement();
-                Gizmos.color = Color.red;
-                Gizmos.DrawLine(m_HipsTransform.position, m_HipsTransform.position + characterMovement);
-
-                Gizmos.color = Color.yellow;
-
-                Vector3 pos = m_HipsTransform.position + m_CurrentFrameData.m_PositionHipProjection;
-                Vector3 nextPos = m_HipsTransform.position + m_CurrentFrameData.m_PositionFuturHipProjection;
-                Vector3 fwd = nextPos - pos;
-                Gizmos.DrawCube(pos, Vector3.one * .4f);
-                Gizmos.DrawRay(pos, fwd * 5 * 5);
+                ApplyAnimationFrameAdaptRotationBeforeAnimation();
             }
-        }
+            if (m_ApplyTranslation)
+            {
+                ApplyAnimationFrameAdaptTranslation();
+            }
 
+            if (m_ApplyAnimation)
+            {
+
+                m_AnimationController.RunNFramesFromFrame(
+                    m_FramesIntervalToUse,
+                    frameData.m_FrameNumber,
+                    () => m_FrameIntervalIsRunning = true
+                );
+            }
+            else
+            {
+                m_FrameIntervalIsRunning = true;
+            }
+            if (m_ApplyRotation)
+            {
+                ApplyAnimationFrameAdaptRotationAfterAnimation();
+            }
+
+        }
+        #endregion
+        #region Adapt character to animation
         public void ApplyAnimationFrameAdaptRotationBeforeAnimation()
         {
 #if ROTATE_CHARACTER
@@ -236,47 +252,7 @@ namespace MotionMatching.Animation
         {
             transform.localPosition -= (m_CurrentFrameData.m_PositionHipProjection - m_HipsTransform.localPosition);
         }
-        private void ApplyAnimationFrame(MocapFrameData frameData)
-        {   
-            Debug.Log("ApplyAnimationFrame (from:" + frameData.m_FrameNumber + "; interval: " + m_MMAnimationFinished + ")");
-
-            Debug.Log("hip framedata Position " + frameData.m_PositionHipProjection);
-            Debug.Log("hip framedata Rotation " + frameData.m_RotationHipProjection);
-
-            // m_HipsTransform.parent.Rotate(m_HipsTransform.parent.transform.up, 180.0f);
-
-            if (m_ApplyRotation)
-            {
-                ApplyAnimationFrameAdaptRotationBeforeAnimation();
-            }
-            if (m_ApplyTranslation)
-            {
-                ApplyAnimationFrameAdaptTranslation();
-            }
-
-            if (m_ApplyAnimation)
-            {
-
-                m_AnimationController.RunNFramesFromFrame(
-                    m_MotionMatchingFramesIntervalToUse,
-                    frameData.m_FrameNumber,
-                    () => m_MMAnimationFinished = true
-                );
-            }
-            else
-            {
-                m_MMAnimationFinished = true;
-            }
-            if (m_ApplyRotation)
-            {
-                ApplyAnimationFrameAdaptRotationAfterAnimation();
-            }
-
-        }
-
-        
-
-        
+        #endregion
     }
 
-}   
+}

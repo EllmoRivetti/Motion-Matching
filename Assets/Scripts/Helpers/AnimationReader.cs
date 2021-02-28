@@ -1,7 +1,6 @@
 ﻿using Assets.Helpers;
 using MotionMatching.Animation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -9,8 +8,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading;
-using UnityEditor.Experimental.AssetImporters;
 using UnityEngine;
 
 #region TreeParsing
@@ -73,6 +70,8 @@ public class Node
 
 #endregion
 
+// This class was used to parse a FBX file into a LoadedAnimationFile
+[Obsolete("Use UnityAnimationConverter instead.")]
 public static class AnimationReader
 {
     static readonly double FRAME_SIZE = 1924423250;
@@ -217,23 +216,23 @@ public static class AnimationReader
     static BoneData SetData(BoneData currentData, string trs, string xyz, float value)
     {
         if (trs == "T" && xyz == "X")
-            currentData.m_Position_ls.x = value;
+            currentData.m_Position_l.x = value;
         if (trs == "T" && xyz == "Y")
-            currentData.m_Position_ls.y = value;
+            currentData.m_Position_l.y = value;
         if (trs == "T" && xyz == "Z")
-            currentData.m_Position_ls.z = value;
+            currentData.m_Position_l.z = value;
         if (trs == "R" && xyz == "X")
-            currentData.m_EulerAngles_ls_d.x = value;
+            currentData.m_EulerAngles_l_d.x = value;
         if (trs == "R" && xyz == "Y")
-            currentData.m_EulerAngles_ls_d.y = value;
+            currentData.m_EulerAngles_l_d.y = value;
         if (trs == "R" && xyz == "Z")
-            currentData.m_EulerAngles_ls_d.z = value;
+            currentData.m_EulerAngles_l_d.z = value;
         if (trs == "S" && xyz == "X")
-            currentData.m_LocalScale.x = value;
+            currentData.m_Scale_l.x = value;
         if (trs == "S" && xyz == "Y")
-            currentData.m_LocalScale.y = value;
+            currentData.m_Scale_l.y = value;
         if (trs == "S" && xyz == "Z")
-            currentData.m_LocalScale.z = value;
+            currentData.m_Scale_l.z = value;
         return currentData;
     }
     static float GetValue(SortedDictionary<int, Dictionary<eRigBodyParts, BoneData>> dic, eRigBodyParts r, string trs, string xyz, int frame)
@@ -246,23 +245,23 @@ public static class AnimationReader
             {
                 //Debug.Log($"In set data : {pair.Key} {trs} {xyz} / " + pair.Value.m_Position + " - " + pair.Value.m_Rotation + " - " + pair.Value.m_Scale);
                 if (trs == "T" && xyz == "X")
-                    return pair.Value.m_Position_ls.x;
+                    return pair.Value.m_Position_l.x;
                 if (trs == "T" && xyz == "Y")
-                    return pair.Value.m_Position_ls.y;
+                    return pair.Value.m_Position_l.y;
                 if (trs == "T" && xyz == "Z")
-                    return pair.Value.m_Position_ls.z;
+                    return pair.Value.m_Position_l.z;
                 if (trs == "R" && xyz == "X")
-                    return pair.Value.m_EulerAngles_ls_d.x;
+                    return pair.Value.m_EulerAngles_l_d.x;
                 if (trs == "R" && xyz == "Y")
-                    return pair.Value.m_EulerAngles_ls_d.y;
+                    return pair.Value.m_EulerAngles_l_d.y;
                 if (trs == "R" && xyz == "Z")
-                    return pair.Value.m_EulerAngles_ls_d.z;
+                    return pair.Value.m_EulerAngles_l_d.z;
                 if (trs == "S" && xyz == "X")
-                    return pair.Value.m_LocalScale.x;
+                    return pair.Value.m_Scale_l.x;
                 if (trs == "S" && xyz == "Y")
-                    return pair.Value.m_LocalScale.y;
+                    return pair.Value.m_Scale_l.y;
                 if (trs == "S" && xyz == "Z")
-                    return pair.Value.m_LocalScale.z;
+                    return pair.Value.m_Scale_l.z;
             }
         }
         Debug.LogError("Bug GetValue");
@@ -350,5 +349,4 @@ public static class AnimationReader
 
         return currentNode;
 	}
-
 }
