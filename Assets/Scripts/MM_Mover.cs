@@ -14,32 +14,41 @@ namespace MotionMatching.Animation
     public class MM_Mover : MonoBehaviour
     {
         public Transform m_Destination;
-        public AnimationController m_AnimationController;
-        [Range(0, 50)] public int m_MotionMatchingFramesIntervalToUse = 10;
-        private bool m_MMAnimationFinished = true;
+        [Range(0.0f, 5.0f)] public float m_StopDistance;
+        [ReadOnly] public int m_RecommendedFramesIntervalToUse = MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE;
+        [Range(0, 50)] public int m_MotionMatchingFramesIntervalToUse = MotionMatching.Constants.MM_NEXT_FRAME_INTERVAL_SIZE;
         public Transform m_HipsTransform;
 
-        public bool m_ApplyRotation = true;
+        [ReadOnly] public bool m_ApplyRotation = false;
         public bool m_ApplyTranslation = true;
-        public bool m_ApplyAnimation = false;
-        public bool m_ApplyMMInUpdate = false;
+        public bool m_ApplyAnimation = true;
+        public bool m_ApplyMMInUpdate = true;
         public float m_DeltaTime = 1.0f;
 
+        private bool m_CalculatingMotionMatchingFrame = false;
+        private bool m_MMAnimationFinished = true;
+        AnimationController m_AnimationController;
         MocapFrameData m_CurrentFrameData;
 
-        private bool m_CalculatingMotionMatchingFrame = false;
 
-
+        private void Awake()
+        {
+            m_AnimationController = GetComponent<AnimationController>();
+        }
         private void OnValidate()
         {
             Time.timeScale = m_DeltaTime;
         }
         void Update()
         {
-            //print(transform.rotation);
-            if (m_ApplyMMInUpdate)
+            if (m_ApplyMMInUpdate && !ReachedTarget(m_Destination.position))
                 RunMotionMatchingOnce(verbose: false);
+        }
 
+        private bool ReachedTarget(Vector3 target)
+        {
+            float currentDistance = Vector2.Distance(new Vector2(m_HipsTransform.position.x, m_HipsTransform.position.z), new Vector2(target.x, target.z));
+            return currentDistance <= m_StopDistance;
         }
 
         [Button]
