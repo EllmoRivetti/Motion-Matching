@@ -7,23 +7,24 @@ Groupe : PLUSZKIEWICZ Stanislaw, RIVETTI Ellmo, THOMAS Gillian, PEIX Vincent
 Ouvrir la SampleScene
 
 Sur l'objet Character:
-- Set les fichiers "None" dans le script Unity Animation Converter, ces fichiers se trouvent dans Animations/ et possèdent des icones personalisés
 
-- Sur l'animator : double cliquer sur animator_without_merge_issues, cliquer sur la boîte orange 38_04, et assigner dans "Motion" l'animation qui se trouve dans Animations/38_04 
+- Sur le script Unity Animation Converter, set les fichiers "None" avec les fichiers se trouvant dans le dossier Animations/ et possèdant des icones personalisés.
 
-- Lancer la scène, puis appuyer sur le bouton "Load Animation From Unity Animator" dans le script Unity Animation Converter et laisser l'animation se jouer jusqu'au bout
+- Sur le script Animator : double cliquer sur animator_without_merge_issues, cliquer sur la boîte orange 38_04, et assigner dans "Motion" l'animation qui se trouve dans Animations/38_04.
+
+- Lancer la scène, puis appuyer sur le bouton "Load Animation From Unity Animator" dans le script Unity Animation Converter et laisser l'animation se jouer jusqu'à la fin.
 
 - Désactiver les scripts : Animator & Unity Animation Converter
 
 - Activer les scripts : MM_Mover & Animation Controller
 
-- Set les fichiers "None" dans le script Animation Controller, ces fichiers se trouvent dans Animations/ et possèdent des icones personalisés
+- Sur le script Animation Controller, set les fichiers "None" avec les fichiers se trouvant dans le dossier Animations/ et possèdant des icones personalisés.
 
 # Résultat
 
 Au lancement de la scène, le personnage devrait se diriger vers le coffre.
 
-Il est possible de modifier le gameobject "Destination" pendant l'éxécution pour forcer des déplacements au personnage.
+Il est possible de modifier le gameobject "Destination" pendant l'exécution pour forcer des déplacements au personnage.
 
 Il est possible de modifier le nombre de frames jouées avant la réapplication de l'algorithme de motion matching. Cela ne change pas l'écart utilisé pour calculer les positions entre une frame et sa position future.
 
