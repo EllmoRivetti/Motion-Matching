@@ -958,7 +958,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079202615}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: bad187a12c831be458464e1326171251, type: 3}
   m_Controller: {fileID: 9100000, guid: db15b3f7536a09d449ea261e69cb84c2, type: 2}
   m_CullingMode: 1
@@ -976,13 +976,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079202615}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 95a6d9f876ac5b7409228c5036850646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_BonesMatching: {fileID: 11400000, guid: 1b4f1a1e45de83e4a8bc50a27b54bb9a, type: 2}
-  m_File: {fileID: 11400000, guid: 14018545802a2f0439b4a178afd7f19c, type: 2}
+  m_BonesMatching: {fileID: 0}
+  m_File: {fileID: 0}
   m_AnimationSpeedMultiplicator: 2
 --- !u!136 &2079202623
 CapsuleCollider:
@@ -1005,7 +1005,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079202615}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9da7cf152f420b9438b14891c3f12f82, type: 3}
   m_Name: 
@@ -1027,7 +1027,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2079202615}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c6c4b0918df1fea4a845ca2aa98c5a5c, type: 3}
   m_Name: 
@@ -1634,9 +1634,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  m_LoadedBonesMatching: {fileID: 11400000, guid: 1b4f1a1e45de83e4a8bc50a27b54bb9a, type: 2}
-  m_LoadedMocapFrameData: {fileID: 11400000, guid: f4a47283031209440bcc1efbb41f284e, type: 2}
-  m_LoadedAnimationFile: {fileID: 11400000, guid: 14018545802a2f0439b4a178afd7f19c, type: 2}
+  m_LoadedBonesMatching: {fileID: 11400000, guid: 3a0aa80cef9218f44a6e0eeca76adb95, type: 2}
+  m_LoadedMocapFrameData: {fileID: 11400000, guid: 5acc983033e18604998087b3b5964dba, type: 2}
+  m_LoadedAnimationFile: {fileID: 11400000, guid: 587a284b6be2ad04dbfaf03e1fe665a9, type: 2}
   m_FramesToRun: 30
 --- !u!1 &9171100888350671
 GameObject:
