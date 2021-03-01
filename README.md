@@ -12,6 +12,8 @@ Sur l'objet Character:
 
 - Sur le script Animation Controller, set les fichiers "None" avec les fichiers se trouvant dans le dossier Animations/ et possèdant des icones personalisés.
 
+- Appuyer sur le bouton "Copy bones matching" dans le script Animation Controller.
+
 - Sur le script Animator : double cliquer sur animator_without_merge_issues, cliquer sur la boîte orange 38_04, et assigner dans "Motion" l'animation qui se trouve dans Animations/38_04.
 
 - Lancer la scène, puis appuyer sur le bouton "Load Animation From Unity Animator" dans le script Unity Animation Converter et laisser l'animation se jouer jusqu'à la fin.
